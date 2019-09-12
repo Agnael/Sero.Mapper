@@ -1,37 +1,33 @@
-## Welcome to GitHub Pages
+# Sero.Mapper
+Lightweight mapping organization utility to keep track of type transformations. 
 
-You can use the [editor on GitHub](https://github.com/Agnael/Sero.Mapper/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+### Why not just use AutoMapper instead?
+AutoMapper is a very powerful, battle proven tool, but it&apos;s just an overkill and even inconvenient for some scenarios.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+Please have in mind:
 
-### Markdown
+- **Readability**: Unless you are mapping completely identical classes, AutoMapper ends up being very verbose, sometimes even more than if the mappings were done by hand using simple value assignations. Each field you have to specify by hand in AutoMapper its a long, bloated fluent method chain for that property, which basically is just a hard to read value assignation.
+- **Debugging**: In AutoMapper you define your transformations using a fluent notation and then it processes them in a magic black box. If it happens to break, you rely on AutoMapper&apos;s exception messages, which are generally useful but sometimes can be confusing or misleading. Using SeroMapper, you get the exact line that causes the exception because its just a regular code block, so you can also set breakpoints inside of it.
+- **Performance**: SeroMapper is presumably faster, since its way simplier, doesn&apos;t need to build thransformations since the developer is defining them explicitly (and not via rule definition) and doesn&apos;t rely on reflection as much. It also lacks a lot of features AutoMapper provides.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
-```markdown
-Syntax highlighted code block
+### Usage
+Our goal is to transform the **User** object into an **UserDTO** object.
 
-# Header 1
-## Header 2
-### Header 3
+- Register your transformation, using the static method **Mapper.CreateMap&lt;SourceType, DestinationType&gt;()**:
+```csharp
+Mapper.CreateMap<User, UserDTO>(user =>
+{
+	UserDTO dto = new UserDTO();
+	dto.IdUser = user.Id;
+	dto.Name = user.Usermame;
 
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+	return dto;
+});
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Agnael/Sero.Mapper/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+- Use your transformation, using the static method **Mapper.Map&lt;DestinationType&gt;(SourceType obj)**:
+```csharp
+User userDb = _db.Users.GetById(100);
+UserDto userDto = Mapper.Map<UserDTO>(user);
+```
