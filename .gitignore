@@ -1,0 +1,9 @@
+.vs/
+
+Sero.Mapper/bin/
+Sero.Mapper/obj/
+
+Publish/
+
+Sero.Mapper.UnitTests/bin/
+Sero.Mapper.UnitTests/obj/

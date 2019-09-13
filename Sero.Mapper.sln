@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28822.285
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sero.Mapper", "Sero.Mapper\Sero.Mapper.csproj", "{D973E451-81C5-4797-9833-8377BFB4BBFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sero.Mapper", "Sero.Mapper\Sero.Mapper.csproj", "{D973E451-81C5-4797-9833-8377BFB4BBFA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sero.Mapper.UnitTests", "Sero.Mapper.UnitTests\Sero.Mapper.UnitTests.csproj", "{F5D24D62-D5C6-4775-898E-C53162B790F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{D973E451-81C5-4797-9833-8377BFB4BBFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D973E451-81C5-4797-9833-8377BFB4BBFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D973E451-81C5-4797-9833-8377BFB4BBFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5D24D62-D5C6-4775-898E-C53162B790F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5D24D62-D5C6-4775-898E-C53162B790F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5D24D62-D5C6-4775-898E-C53162B790F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5D24D62-D5C6-4775-898E-C53162B790F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
