@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,8 @@ namespace Sero.Mapper
             this.MappingHandlers = mappingHandlers;
         }
 
-        public TDestination Map<TDestination>(object obj)
+        public TDestination Map<TDestination>(object obj, 
+                                            TDestination existingDestination = default(TDestination))
         {
             if (obj == null)
                 return default(TDestination);
@@ -22,35 +24,23 @@ namespace Sero.Mapper
             Type sourceType = obj.GetType();
             Type destinationType = typeof(TDestination);
 
-            var mapping = MappingHandlers.FirstOrDefault(x => x.SourceType == sourceType 
+            var mapping = MappingHandlers.FirstOrDefault(x => x.SourceType == sourceType
                                                             && x.DestinationType == destinationType);
 
             if (mapping == null)
                 throw new Exception("There is no mapping defined for this SOURCE-DESTINATION pair.");
 
-            var dto = (TDestination)mapping.Transformation.Invoke(obj);
-            return dto;
-        }
-        
-        public IList<TDestination> Map<TDestination>(IList<object> objList)
-        {
-            if (objList == null)
-                return null;
-
-            var dstList = new List<TDestination>();
-
-            foreach (var obj in objList)
+            // If the existingDestination parameter was not passed, instantiate a new one
+            if(EqualityComparer<TDestination>.Default.Equals(existingDestination, default(TDestination)))
             {
-                var dst = Map<TDestination>(obj);
-
-                if (dst != null)
-                    dstList.Add(dst);
+                existingDestination = Activator.CreateInstance<TDestination>();
             }
 
-            return dstList;
+            TDestination dto = (TDestination)mapping.Transformation.Invoke(obj, existingDestination);
+            return dto;
         }
 
-        public IList<TDestination> Map<TDestination>(ICollection<object> objList)
+        public ICollection<TDestination> MapList<TDestination>(IEnumerable<object> objList)
         {
             if (objList == null)
                 return null;
@@ -60,9 +50,7 @@ namespace Sero.Mapper
             foreach (var obj in objList)
             {
                 var dst = Map<TDestination>(obj);
-
-                if (dst != null)
-                    dstList.Add(dst);
+                dstList.Add(dst);
             }
 
             return dstList;

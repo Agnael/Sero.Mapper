@@ -14,12 +14,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DataBuilders\" />
-    <Folder Include="Tests\MapperBuilders\" />
+    <ProjectReference Include="..\Sero.Mapper\Sero.Mapper.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sero.Mapper\Sero.Mapper.csproj" />
+    <Folder Include="MapperBuilder\" />
   </ItemGroup>
 
 </Project>
