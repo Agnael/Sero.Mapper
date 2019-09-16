@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Sero.Mapper;
 
-namespace Sero.Mapper.UnitTests.Tests.Mappers.BasicMapper
+namespace Sero.Mapper.UnitTests
 {
     internal class BasicMapperBuilder
     {
@@ -12,6 +12,16 @@ namespace Sero.Mapper.UnitTests.Tests.Mappers.BasicMapper
         public BasicMapperBuilder()
         {
             _mapperbuilder = new MapperBuilder();
+        }
+
+        internal BasicMapperBuilder WithDefaultMapping()
+        {
+            _mapperbuilder.CreateMap<SrcTest, DestTest>((src, dest) => {
+                dest.IdSrc = src.Id;
+                dest.NameSrc = src.Name;
+                dest.DescriptionSrc = src.Description;
+            });
+            return this;
         }
 
         internal BasicMapperBuilder WithMapping<TSrc, TDest>(TransformationMask<TSrc, TDest> transformation)
