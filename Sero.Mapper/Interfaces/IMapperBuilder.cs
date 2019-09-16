@@ -6,7 +6,7 @@ namespace Sero.Mapper
 {
     public interface IMapperBuilder
     {
-        void CreateMap<TSource, TDestination>(Func<TSource, TDestination> func);
+        void CreateMap<TSource, TDestination>(TransformationMask<TSource, TDestination> funcMask);
 
         void AddSheet(AbstractMappingSheet sheet);
 
