@@ -5,6 +5,8 @@ using System.Text;
 
 namespace Sero.Mapper
 {
+    public delegate void TransformationMask<TSrc, TDest>(TSrc src, TDest dest);
+
     public class MapperBuilder : IMapperBuilder
     {
         private List<MappingHandler> _mappingList;
@@ -19,11 +21,16 @@ namespace Sero.Mapper
             sheet.MappingRegistration(this);
         }
 
-        public void CreateMap<TSource, TDestination>(Func<TSource, TDestination> func)
+        public void CreateMap<TSource, TDestination>(TransformationMask<TSource, TDestination> funcMask)
         {
             var mapping = new MappingHandler(typeof(TSource),
                                       typeof(TDestination),
-                                      f => func((TSource)f));
+                                      obj =>
+                                      {
+                                          TDestination dest = Activator.CreateInstance<TDestination>();
+                                          funcMask((TSource)obj, dest);
+                                          return dest;
+                                      });
 
             bool isExisting = _mappingList.Any(x => x.SourceType == mapping.SourceType
                                                     && x.DestinationType == mapping.DestinationType);

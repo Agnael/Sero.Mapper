@@ -4,8 +4,6 @@ using System.Text;
 
 namespace Sero.Mapper
 {
-    public delegate object Transformation(object entity);
-
     public class MappingHandler
     {
         public Type SourceType { get; set; }

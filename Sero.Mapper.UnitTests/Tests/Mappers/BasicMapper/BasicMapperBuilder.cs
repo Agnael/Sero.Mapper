@@ -14,7 +14,7 @@ namespace Sero.Mapper.UnitTests.Tests.Mappers.BasicMapper
             _mapperbuilder = new MapperBuilder();
         }
 
-        internal BasicMapperBuilder WithMapping<TSrc, TDest>(Func<TSrc, TDest> transformation)
+        internal BasicMapperBuilder WithMapping<TSrc, TDest>(TransformationMask<TSrc, TDest> transformation)
         {
             _mapperbuilder.CreateMap<TSrc, TDest>(transformation);
             return this;

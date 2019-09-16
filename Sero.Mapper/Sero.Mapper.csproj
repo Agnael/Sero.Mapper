@@ -9,6 +9,7 @@
     <PackageTags>Mapper Type Mapping Mapping Organization</PackageTags>
     <Authors>Oleg Kuzmych</Authors>
     <PackageLicenseExpression>GPL-3.0-only	</PackageLicenseExpression>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
