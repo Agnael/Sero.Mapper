@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Sero.Mapper;
+using Sero.Mapper.UnitTests.TestInfrastructure.Sheets;
 
 namespace Sero.Mapper.UnitTests
 {
@@ -16,11 +17,7 @@ namespace Sero.Mapper.UnitTests
 
         internal BasicMapperBuilder WithDefaultMapping()
         {
-            _mapperbuilder.CreateMap<SrcTest, DestTest>((src, dest) => {
-                dest.IdSrc = src.Id;
-                dest.NameSrc = src.Name;
-                dest.DescriptionSrc = src.Description;
-            });
+            _mapperbuilder.AddSheet<DefaultTestMappings>();
             return this;
         }
 

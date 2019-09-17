@@ -8,7 +8,8 @@ namespace Sero.Mapper
     {
         void CreateMap<TSource, TDestination>(TransformationMask<TSource, TDestination> funcMask);
 
-        void AddSheet(AbstractMappingSheet sheet);
+        void AddSheet(IMappingSheet sheet);
+        void AddSheet<T>() where T : IMappingSheet;
 
         IMapper Build();
     }

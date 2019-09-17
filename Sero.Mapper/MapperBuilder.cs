@@ -14,9 +14,15 @@ namespace Sero.Mapper
             _mappingList = new List<MappingHandler>();
         }
 
-        public void AddSheet(AbstractMappingSheet sheet)
+        public void AddSheet(IMappingSheet sheet)
         {
             sheet.MappingRegistration(this);
+        }
+
+        public void AddSheet<T>() where T : IMappingSheet
+        {
+            IMappingSheet instance = Activator.CreateInstance<T>();
+            instance.MappingRegistration(this);
         }
 
         public void CreateMap<TSource, TDestination>(TransformationMask<TSource, TDestination> funcMask)
