@@ -57,6 +57,19 @@ namespace Sero.Mapper.UnitTests.Mappers.BasicMapper
             Assert.Equal(expected, actual, _destComparer);
         }
 
+        [Fact]
+        public void Single__Null__Null()
+        {
+            SrcTest src = null;
+            DestTest expected = null;
+
+            IMapper sut = _sutBuilder.WithDefaultMapping().Build();
+
+            DestTest actual = sut.Map<DestTest>(src);
+
+            Assert.Equal(expected, actual, _destComparer);
+        }
+
         //[Theory]
         //[InlineData("")]
         //[InlineData(null)]
