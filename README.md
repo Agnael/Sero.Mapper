@@ -59,6 +59,6 @@ IMapper mapper = new MapperBuilder()
 
 1. Use your transformation, using the **Map&lt;DestinationType&gt;** method:
 ```csharp
-User userDb = new User { Id = 100, Name = "Test user", Birthdate = DateTime.UtcNow.AddYears(-20) };
+User user = new User { Id = 100, Name = "Test user", Birthdate = DateTime.UtcNow.AddYears(-20) };
 UserDto userDto = mapper.Map<UserDTO>(user);
 ```
