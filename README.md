@@ -18,16 +18,16 @@ Our goal is to transform instances of the class **User** into instances of **Use
 ```csharp
 public class User
 {
-	public int Id { get; set; }
-	public string Name { get; set; }
-	public DateTime Birthdate { get; set; }
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public DateTime Birthdate { get; set; }
 }
 
 public class UserDTO
 {
-	public int IdUser { get; set; }
-	public string Username { get; set; }
-	public DateTime UserBirthday { get; set; }
+    public int IdUser { get; set; }
+    public string Username { get; set; }
+    public DateTime UserBirthday { get; set; }
 }
 ```
 
@@ -37,23 +37,23 @@ public class UserDTO
 ```csharp
 public class YourMappings : IMappingSheet
 {
-	public void MappingRegistration(IMapperBuilder builder)
-	{
-		builder.CreateMap<User, UserDTO>((user, userDto) => 
-		{
-			userDto.IdUser = user.Id;
-			userDto.Username = user.Name;
-			userDto.UserBirthday = user.Birthdate;
-		});
-	}
+    public void MappingRegistration(IMapperBuilder builder)
+    {
+        builder.CreateMap<User, UserDTO>((user, userDto) => 
+        {
+            userDto.IdUser = user.Id;
+            userDto.Username = user.Name;
+            userDto.UserBirthday = user.Birthdate;
+        });
+    }
 }
 ```
 
 1. Instantiate a new SeroMapper instance using the **MapperBuilder** class and register your mapping sheet:
 ```csharp
-	IMapper mapper = new MapperBuilder()
-									.AddSheet<YourMappings>()
-									.Build();
+IMapper mapper = new MapperBuilder()
+                        .AddSheet<YourMappings>()
+                        .Build();
 ```
 *You can also register mappings without a sheet, using the same **CreateMap** method of the MapperBuilder, used in the sheet implementations.*
 
