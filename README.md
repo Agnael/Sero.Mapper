@@ -1,4 +1,4 @@
-![SERO.Mapper banner](https://i.imgur.com/Icp7pB6.jpg)
+![SERO.Mapper banner](https://i.imgur.com/SQOMHea.png)
 
 # Sero.Mapper
 Lightweight mapping organization utility to keep track of type transformations. 
