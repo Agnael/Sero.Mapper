@@ -17,23 +17,36 @@ The quickest way to get the latest version is to add it to your project using **
 
 ## Usage
 Our goal is to transform instances of the class **User** into instances of **UserDTO**.
-```csharp
+
+<table>
+    <tr>
+        <th>User.cs</th>
+        <th>UserDTO.cs</th>
+    </tr>
+<tr>
+<td>
+   <pre lang="csharp">
 public class User
 {
     public int Id { get; set; }
     public string Name { get; set; }
     public DateTime Birthdate { get; set; }
 }
-
+   </pre>
+</td>
+<td>
+  <pre lang="csharp">
 public class UserDTO
 {
     public int IdUser { get; set; }
     public string Username { get; set; }
     public DateTime UserBirthday { get; set; }
 }
-```
+  </pre>
+</td>
+</tr>
+</table>
 
------
 
 1. Create one or many mapping collection sheets, implementing the **IMappingSheet** interface:
 ```csharp
