@@ -9,7 +9,7 @@ Lightweight mapping organization utility to keep track of type transformations.
 &nbsp;&nbsp;&nbsp;&nbsp;[Repeating assignations whenever needed](#Repeating-assignations-whenever-needed)  
 &nbsp;&nbsp;&nbsp;&nbsp;[Assembler classes](#Assembler-classes)  
 &nbsp;&nbsp;&nbsp;&nbsp;[AutoMapper](#AutoMapper)  
-&nbsp;&nbsp;[**The Sero.Mapper solution**](#The-Sero.Mapper-solution)  
+&nbsp;&nbsp;[**The SeroMapper solution**](#The-Sero.Mapper-solution)  
 &nbsp;&nbsp;&nbsp;&nbsp;[Pros and Cons](#Pros-and-cons)  
 &nbsp;&nbsp;[**Usage**](#Usage)  
 
