@@ -167,11 +167,11 @@ public class EntityMappings : IMappingSheet
     {
         builder.CreateMap&lt;OrderDTO, Order&gt;((entity, dto) => 
         {
-			if(dto.User != null)
-				entity.IdUser = dto.User.UserId;
+		if(dto.User != null)
+			entity.IdUser = dto.User.UserId;
 
-			if(dto.Items != null)
-				entity.OrderItems = dto.Items.Select(x => new OrderItem { IdItem = x }).ToList();
+		if(dto.Items != null)
+			entity.OrderItems = dto.Items.Select(x => new OrderItem { IdItem = x }).ToList();
         });
     }
 }
