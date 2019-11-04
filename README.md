@@ -31,22 +31,22 @@ Each time you need this conversion, you manually map each property:
 <pre lang="csharp">
 public class OrderManager
 {
-	... ... ... ...
-	/// Saves a new Order. 
-	public void SaveOrder(OrderDTO dto)
-	{
-		Order order = new Order();
+   ... ... ... ...
+   /// Saves a new Order. 
+   public void SaveOrder(OrderDTO dto)
+   {
+      Order order = new Order();
+      
+      if(dto.User != null)
+         order.IdUser = dto.User.UserId;
 
-		if(dto.User != null)
-			order.IdUser = dto.User.UserId;
+      if(dto.Items != null)
+         order.OrderItems = dto.Items.Select(x => new OrderItem { IdItem = x }).ToList();
 
-		if(dto.Items != null)
-			order.OrderItems = dto.Items.Select(x => new OrderItem { IdItem = x }).ToList();
-
-		_db.Orders.Add(order);
-		_db.SaveChanges();
-	}
-	... ... ... ...
+      _db.Orders.Add(order);
+      _db.SaveChanges();
+   }
+... ... ... ...
 }
 </pre>
 
@@ -61,15 +61,15 @@ All the conversions are centralized in specialized classes:
 <pre lang="csharp">
 public class OrderManager
 {
-	... ... ... ...
-	/// Saves a new Order. 
-	public void SaveOrder(OrderDTO dto)
-	{
-		Order order = _entityAssembler.OrderDtoToOrderEntity(dto);
-		_db.Orders.Add(order);
-		_db.SaveChanges();
-	}
-	... ... ... ...
+   ... ... ... ...
+   /// Saves a new Order. 
+   public void SaveOrder(OrderDTO dto)
+   {
+      Order order = _entityAssembler.OrderDtoToOrderEntity(dto);
+      _db.Orders.Add(order);
+      _db.SaveChanges();
+   }
+   ... ... ... ...
 }
 </pre>
 
@@ -77,20 +77,20 @@ public class OrderManager
 <pre lang="csharp">
 public class EntityAssembler
 {
-	... ... ... ...
-	public Order OrderDtoToOrderEntity(OrderDTO dto)
-	{
-		Order order = new Order();
+   ... ... ... ...
+   public Order OrderDtoToOrderEntity(OrderDTO dto)
+   {
+      Order order = new Order();
 
-		if(dto.User != null)
-			order.IdUser = dto.User.UserId;
+      if(dto.User != null)
+         order.IdUser = dto.User.UserId;
 
-		if(dto.Items != null)
-			order.OrderItems = dto.Items.Select(x => new OrderItem { IdItem = x }).ToList();
+      if(dto.Items != null)
+         order.OrderItems = dto.Items.Select(x => new OrderItem { IdItem = x }).ToList();
 		
-		return order;
-	}
-	... ... ... ...
+      return order;
+   }
+   ... ... ... ...
 }
 </pre>
 
@@ -108,15 +108,15 @@ A very powerful tool, you are pretty much covered if you go this route. However,
 <pre lang="csharp">
 public class OrderManager
 {
-	... ... ... ...
-	/// Saves a new Order. 
-	public void SaveOrder(OrderDTO dto)
-	{
-		Order order = Mapper.Map&lt;Order&gt;(dto);
-		_db.Orders.Add(order);
-		_db.SaveChanges();
-	}
-	... ... ... ...
+   ... ... ... ...
+   /// Saves a new Order. 
+   public void SaveOrder(OrderDTO dto)
+   {
+      Order order = Mapper.Map&lt;Order&gt;(dto);
+      _db.Orders.Add(order);
+      _db.SaveChanges();
+   }
+   ... ... ... ...
 }
 </pre>
 
@@ -124,15 +124,15 @@ public class OrderManager
 <pre lang="csharp">
 public class DtoToEntityProfile : Profile
 {
-	public DtoToEntityProfile()
-	{
-		CreateMap&lt;OrderDTO, Order&gt;()
-			 .ForMember(dest => dest.IdUser, dto => dto.PreCondition(x => x.User != null))
-				.ForMember(dest => dest.IdUser, dto => dto.MapFrom(x => x.User.UserId))
-			.ForMember(dest => dest.OrderItems, dto => dto.PreCondition(x => x.Items != null)
-				.ForMember(dest => dest.OrderItems, dto => dto.Items.Select(x => new OrderItem { IdItem = x }).ToList())
-			.ForMember(dest => dest.User, dto => dto.Ignore());
-	}
+   public DtoToEntityProfile()
+   {
+      CreateMap&lt;OrderDTO, Order&gt;()
+         .ForMember(dest => dest.IdUser, dto => dto.PreCondition(x => x.User != null))
+            .ForMember(dest => dest.IdUser, dto => dto.MapFrom(x => x.User.UserId))
+         .ForMember(dest => dest.OrderItems, dto => dto.PreCondition(x => x.Items != null)
+	    .ForMember(dest => dest.OrderItems, dto => dto.Items.Select(x => new OrderItem { IdItem = x }).ToList())
+         .ForMember(dest => dest.User, dto => dto.Ignore());
+   }
 }
 </pre>
 
@@ -147,15 +147,15 @@ This example is a quick overview of the end result of using Sero.Mapper. Detaile
 <pre lang="csharp">
 public class OrderManager
 {
-	... ... ... ...
-	/// Saves a new Order. 
-	public void SaveOrder(OrderDTO dto)
-	{
-		Order order = _mapper.Map&lt;Order&gt;(dto);
-		_db.Orders.Add(order);
-		_db.SaveChanges();
-	}
-	... ... ... ...
+   ... ... ... ...
+   /// Saves a new Order. 
+   public void SaveOrder(OrderDTO dto)
+   {
+      Order order = _mapper.Map&lt;Order&gt;(dto);
+      _db.Orders.Add(order);
+      _db.SaveChanges();
+   }
+   ... ... ... ...
 }
 </pre>
 
@@ -163,17 +163,17 @@ public class OrderManager
 <pre lang="csharp">
 public class EntityMappings : IMappingSheet
 {
-    public void EntityMappings(IMapperBuilder builder)
-    {
-        builder.CreateMap&lt;OrderDTO, Order&gt;((entity, dto) => 
-        {
-		if(dto.User != null)
-			entity.IdUser = dto.User.UserId;
+   public void EntityMappings(IMapperBuilder builder)
+   {
+      builder.CreateMap&lt;OrderDTO, Order&gt;((entity, dto) => 
+      {
+         if(dto.User != null)
+            entity.IdUser = dto.User.UserId;
 
-		if(dto.Items != null)
-			entity.OrderItems = dto.Items.Select(x => new OrderItem { IdItem = x }).ToList();
-        });
-    }
+         if(dto.Items != null)
+            entity.OrderItems = dto.Items.Select(x => new OrderItem { IdItem = x }).ToList();
+      });
+   }
 }
 </pre>
 
@@ -194,15 +194,15 @@ public class EntityMappings : IMappingSheet
 ```csharp
 public class YourMappings : IMappingSheet
 {
-    public void MappingRegistration(IMapperBuilder builder)
-    {
-        builder.CreateMap<User, UserDTO>((user, userDto) => 
-        {
-            userDto.IdUser = user.Id;
-            userDto.Username = user.Name;
-            userDto.UserBirthday = user.Birthdate;
-        });
-    }
+   public void MappingRegistration(IMapperBuilder builder)
+   {
+      builder.CreateMap<User, UserDTO>((user, userDto) => 
+      {
+         userDto.IdUser = user.Id;
+         userDto.Username = user.Name;
+         userDto.UserBirthday = user.Birthdate;
+      });
+   }
 }
 ```
 
