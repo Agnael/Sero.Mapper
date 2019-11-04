@@ -184,7 +184,7 @@ public class EntityMappings : IMappingSheet
 
 ### Pros and Cons  
 **PROS**  
-&nbsp;&nbsp;- **Organization**: Your team now have a structure to follow, a key advantage when using AutoMapper that we really like and wanted to keep in this new mapper. The way of defining mappings and using them is normalized by the library and no team member can get creative and screw something up or waste his time creating a duplicate, like when creating Assembler methods.  
+&nbsp;&nbsp;- **Organization**: Your team now have a structure to follow, a key advantage when using AutoMapper that I really like and wanted to keep in this new mapper. The way of defining mappings and using them is normalized by the library and no team member can get creative and screw something up or waste his time creating a duplicate, like when creating Assembler methods.  
 &nbsp;&nbsp;- **Convenience**: In order to improve readability and writing speed, the instantiation and the returning of the destination instance is handled by Sero.Mapper, so you only need to write the actual assignations.    
 &nbsp;&nbsp;- **Debugging**: If any error arises, you get the exact line where the exception was thrown and you can put breakpoints inside of the mappings to debug them on runtime.  
 
