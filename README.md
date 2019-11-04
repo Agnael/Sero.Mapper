@@ -176,7 +176,7 @@ public class EntityMappings : IMappingSheet
    }
 }
 </pre>
-**Note that instantiation and returning of the instance is handled for us.**
+**Note that the instantiation and returning of the instance is handled for us.**
 
 &nbsp;
 
