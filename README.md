@@ -11,7 +11,7 @@ Lightweight mapping organization utility to keep track of type transformations.
 &nbsp;&nbsp;&nbsp;&nbsp;[AutoMapper](#AutoMapper)  
 &nbsp;&nbsp;[**The Sero.Mapper solution**](#The-SeroMapper-solution)  
 &nbsp;&nbsp;&nbsp;&nbsp;[Pros and Cons](#Pros-and-cons)  
-&nbsp;&nbsp;[**Usage**](#Usage)  
+&nbsp;&nbsp;[**Get started**](#Get-started)  
 
 **Installation**
 &nbsp;&nbsp;The quickest way to get the latest version is to add it to your project using **Nuget** [[Sero.Mapper](https://www.nuget.org/packages/Sero.Mapper/ "Sero.Mapper")]
@@ -189,7 +189,7 @@ public class EntityMappings : IMappingSheet
 **CONS**  
 &nbsp;&nbsp;- If your source and destination types are identical or you can trust that follow defined property naming patterns, you will still have to write all of the assignations one by one. AutoMapper would infer them automatically.
 
-## Usage
+## Get started
 
 1. Create one or many mapping collection sheets, implementing the **IMappingSheet** interface:
 ```csharp
