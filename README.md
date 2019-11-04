@@ -27,7 +27,7 @@ This is what you look for if all you need is a clear, simple, straight forward, 
 ## The problem
 Let&apos;s say we receive a new customer order, in the OrderDTO format. We need to store it in our DB but to do that, our ORM forces us to **convert the OrderDTO instance into an Order instance** before trying to save it.
 
-As you can see, to be able to convert an OrderDTO, we also need to be able to convert it&apos;s complex properties. 
+As you can see, to be able to convert an OrderDTO, we also need to be able to convert it&apos;s properties. In this case, it will be rather simple because in order to save it, our ORM just happens to need only the FK ID (Order.IdUser) and we can ignore the Order.User property for saving, since in this case we assume this user already exists in the DB.
 
 ![Example classes diagram](https://i.imgur.com/172n43G.png)
 
