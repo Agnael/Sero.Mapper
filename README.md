@@ -189,7 +189,7 @@ public class EntityMappings : IMappingSheet
 &nbsp;&nbsp;- **Debugging**: If any error arises, you get the exact line where the exception was thrown and you can put breakpoints inside of the mappings to debug them on runtime.  
 
 **CONS**  
-&nbsp;&nbsp;- You get none of the fancy features that AutoMapper or some of the other existing libraries provide. For example, if your source and destination types are identical or you can trust that they follow defined property naming patterns, you will still have to write all of the assignations one by one. AutoMapper would infer them automatically in this case.
+&nbsp;&nbsp;- You get none of the internal features that AutoMapper or some of the other existing libraries provide. For example, if your source and destination types are identical or you can trust that they follow defined property naming patterns, you will still have to write all of the assignations one by one. AutoMapper would infer them automatically in this case.
 
 &nbsp;
 
