@@ -14,6 +14,10 @@ This is what you look for if all you need is a clear, simple, straight forward, 
 &nbsp;&nbsp;[**The Sero.Mapper solution**](#The-SeroMapper-solution)  
 &nbsp;&nbsp;&nbsp;&nbsp;[Pros and Cons](#Pros-and-cons)  
 &nbsp;&nbsp;[**Get started**](#Get-started)  
+&nbsp;&nbsp;&nbsp;&nbsp;[Setting up Sero.Mapper](#Setting-up-SeroMapper) (PENDING)    
+&nbsp;&nbsp;&nbsp;&nbsp;[Mapping collections](#Mapping-collections) (PENDING)  
+&nbsp;&nbsp;&nbsp;&nbsp;[Overwriting an already existing destination instance](#Overwriting-an-already-existing-destination-instance) (PENDING)     
+&nbsp;&nbsp;&nbsp;&nbsp;[Execute a mapping inside another&apos;s transformation definition](#Execute-a-mapping-inside-another&apos;s-transformation-definition) (PENDING)  
 
 **Installation**  
 &nbsp;&nbsp;The quickest way to get the latest version is to add it to your project using **Nuget** [[Sero.Mapper](https://www.nuget.org/packages/Sero.Mapper/ "Sero.Mapper")]
