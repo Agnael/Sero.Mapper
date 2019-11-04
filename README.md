@@ -1,7 +1,9 @@
 ![SERO.Mapper banner](https://i.imgur.com/SQOMHea.png)
 
 # Sero.Mapper
-Lightweight mapping organization utility to keep track of type transformations. 
+Lightweight mapping organization utility to keep track of type transformations.
+
+This is what you look for if all you need is a clear, simple, straight forward, debuggeable and organized way to write **MANUAL** type mappings.
 
 **Index**    
 &nbsp;&nbsp;[**The problem**](#the-problem)  
