@@ -17,7 +17,7 @@ Lightweight mapping organization utility to keep track of type transformations.
 &nbsp;&nbsp;The quickest way to get the latest version is to add it to your project using **Nuget** [[Sero.Mapper](https://www.nuget.org/packages/Sero.Mapper/ "Sero.Mapper")]
 
 ## The problem
-Let&apos;s say we receive a new customer order, in the OrderDTO format. We need to store it in our DB but in order to do that, our ORM forces us to **convert the OrderDTO instance into an Order instance** before trying to save it.
+Let&apos;s say we receive a new customer order, in the OrderDTO format. We need to store it in our DB but to do that, our ORM forces us to **convert the OrderDTO instance into an Order instance** before trying to save it.
 
 As you can see, to be able to convert an OrderDTO, we also need to be able to convert it&apos;s complex properties. 
 
