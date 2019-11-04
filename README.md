@@ -13,8 +13,10 @@ Lightweight mapping organization utility to keep track of type transformations.
 &nbsp;&nbsp;&nbsp;&nbsp;[Pros and Cons](#Pros-and-cons)  
 &nbsp;&nbsp;[**Get started**](#Get-started)  
 
-**Installation**
+**Installation**  
 &nbsp;&nbsp;The quickest way to get the latest version is to add it to your project using **Nuget** [[Sero.Mapper](https://www.nuget.org/packages/Sero.Mapper/ "Sero.Mapper")]
+
+&nbsp;
 
 ## The problem
 Let&apos;s say we receive a new customer order, in the OrderDTO format. We need to store it in our DB but to do that, our ORM forces us to **convert the OrderDTO instance into an Order instance** before trying to save it.
@@ -94,7 +96,7 @@ public class EntityAssembler
 }
 </pre>
 
-This approach can work, but it&apos;s usually verbose and your team must have a very clear naming concensous for the methods in the Assembler. Otherwise, you will end up with duplicate conversions registered, with slightly different names, or even names in different languages if your team is not english native.
+This approach can work, but your team must have a very clear naming concensous for the methods in the Assembler. Otherwise, you will end up with duplicate conversions registered, with slightly different names, or even names in different languages if your team is not english native.
 
 ---
 
@@ -182,12 +184,12 @@ public class EntityMappings : IMappingSheet
 
 ### Pros and Cons  
 **PROS**  
-&nbsp;&nbsp;- **Organization**: Your team now have a structure to follow, a key advantage when using AutoMapper that we really like and wanted to keep in this new mapper. The way of defining mappings and using them is normalized by the library and no team member can get creative and screw something up or waste his time creating a duplicate, like when creating Assembler methods.  
+&nbsp;&nbsp;- **Organization**: Your team now have a structure to follow, a key advantage when using AutoMapper that I really like and wanted to keep in this new mapper. The way of defining mappings and using them is normalized by the library and no team member can get creative and screw something up or waste his time creating a duplicate, like when creating Assembler methods.  
 &nbsp;&nbsp;- **Convenience**: In order to improve readability and writing speed, the instantiation and the returning of the destination instance is handled by Sero.Mapper, so you only need to write the actual assignations.    
 &nbsp;&nbsp;- **Debugging**: If any error arises, you get the exact line where the exception was thrown and you can put breakpoints inside of the mappings to debug them on runtime.  
 
 **CONS**  
-&nbsp;&nbsp;- If your source and destination types are identical or you can trust that follow defined property naming patterns, you will still have to write all of the assignations one by one. AutoMapper would infer them automatically.
+&nbsp;&nbsp;- You get none of the internal features that AutoMapper or some of the other existing libraries provide. For example, if your source and destination types are identical or you can trust that they follow defined property naming patterns, you will still have to write all of the assignations one by one. AutoMapper would infer them automatically in this case.
 
 &nbsp;
 
