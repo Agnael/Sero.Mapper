@@ -4,14 +4,14 @@
 Lightweight mapping organization utility to keep track of type transformations. 
 
 **Index**    
-&nbsp;&nbsp;[**The problem**](#The-problem)  
-&nbsp;&nbsp;[**Known solutions**](#The-problem)  
-&nbsp;&nbsp;&nbsp;&nbsp;[Repeating assignations whenever needed](#repeating-the-assignations-everytime)  
+&nbsp;&nbsp;[**The problem**](#the-problem)  
+&nbsp;&nbsp;[**Known solutions**](#Known solutions)  
+&nbsp;&nbsp;&nbsp;&nbsp;[Repeating assignations whenever needed](#Repeating-assignations-whenever-needed)  
 &nbsp;&nbsp;&nbsp;&nbsp;[Assembler classes](#Assembler-classes)  
-&nbsp;&nbsp;&nbsp;&nbsp;[AutoMapper](#automapper)  
-&nbsp;&nbsp;[**The Sero.Mapper solution**](#The-problem)  
-&nbsp;&nbsp;&nbsp;&nbsp;[Pros and Cons](#automapper)  
-&nbsp;&nbsp;[**Usage**](#The-problem)  
+&nbsp;&nbsp;&nbsp;&nbsp;[AutoMapper](#AutoMapper)  
+&nbsp;&nbsp;[**The Sero.Mapper solution**](#The-Sero.Mapper-solution)  
+&nbsp;&nbsp;&nbsp;&nbsp;[Pros and Cons](#Pros-and-cons)  
+&nbsp;&nbsp;[**Usage**](#Usage)  
 
 **Installation**
 &nbsp;&nbsp;The quickest way to get the latest version is to add it to your project using **Nuget** [[Sero.Mapper](https://www.nuget.org/packages/Sero.Mapper/ "Sero.Mapper")]
@@ -24,7 +24,7 @@ As you can see, to be able to convert an OrderDTO, we also need to be able to co
 ![Example classes diagram](https://i.imgur.com/172n43G.png)
 
 ## Known solutions
-#### Repeating assignations whenever needed
+### Repeating assignations whenever needed
 Each time you need this conversion, you manually map each property:
 
 *OrderManager.cs* 
@@ -52,7 +52,9 @@ public class OrderManager
 
 Of course, this approach is the worst one.
 
-#### Assembler classes
+--- 
+
+### Assembler classes
 All the conversions are centralized in specialized classes:
 
 *OrderManager.cs*
@@ -94,7 +96,9 @@ public class EntityAssembler
 
 This approach can work, but it&apos;s usually verbose and your team must have a very clear naming concensous for the methods in the Assembler. Otherwise, you will end up with duplicate conversions registered, with slightly different names, or even names in different languages if your team is not english native.
 
-#### AutoMapper
+---
+
+### AutoMapper
 A very powerful tool, you are pretty much covered if you go this route. However, in our specific (but not rare) case, AutoMapper is not all that helpful:
 - Since the property names are not identical, nor nested in the same way, AutoMapper will not be able to automatically infer the transformation and we&apos;ll have to define it manually instead.
 - Manual definitions in AutoMapper are verbose, sometimes even more than if they are made with simple assignations, since it ends up looking like a text wall, quite difficult to read in transformations for big classes.
@@ -184,78 +188,7 @@ public class EntityMappings : IMappingSheet
 **CONS**
 &nbsp;&nbsp;- If your source and destination types are identical or you can trust that follow defined property naming patterns, you will still have to write all of the assignations one by one. AutoMapper would infer them automatically.
 
-&nbsp;
-
 ## Usage
-
-
-### Why not just use AutoMapper instead?
-AutoMapper is a very powerful, battle proven tool, but it&apos;s just an overkill and even inconvenient for some scenarios.
-
-## Usage
-Our goal is to transform instances of the class **User** into instances of **UserDTO**.
-
-<table>
-    <tr>
-        <th>User.cs</th>
-        <th>UserDTO.cs</th>
-    </tr>
-<tr>
-<td>
-   <pre lang="csharp">
-public class User
-{
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public DateTime Birthdate { get; set; }
-}
-   </pre>
-</td>
-<td>
-  <pre lang="csharp">
-public class UserDTO
-{
-    public int IdUser { get; set; }
-    public string Username { get; set; }
-    public DateTime UserBirthday { get; set; }
-}
-  </pre>
-</td>
-</tr>
-</table>
-
-
-1. Create one or many mapping collection sheets, implementing the **IMappingSheet** interface:
-```csharp
-public class YourMappings : IMappingSheet
-{
-    public void MappingRegistration(IMapperBuilder builder)
-    {
-        builder.CreateMap<User, UserDTO>((user, userDto) => 
-        {
-            userDto.IdUser = user.Id;
-            userDto.Username = user.Name;
-            userDto.UserBirthday = user.Birthdate;
-        });
-    }
-}
-```
-
-1. Instantiate a new SeroMapper instance using the **MapperBuilder** class and register your mapping sheet:
-```csharp
-IMapper mapper = new MapperBuilder()
-                        .AddSheet<YourMappings>()
-                        .Build();
-```
-*You can also register mappings without a sheet, using the same **CreateMap** method of the MapperBuilder, used in the sheet implementations.*
-
-1. Use your transformation, using the **Map&lt;DestinationType&gt;** method:
-```csharp
-User user = new User { Id = 100, Name = "Test user", Birthdate = DateTime.UtcNow.AddYears(-20) };
-UserDto userDto = mapper.Map<UserDTO>(user);
-```
-
-
 
 1. Create one or many mapping collection sheets, implementing the **IMappingSheet** interface:
 ```csharp
