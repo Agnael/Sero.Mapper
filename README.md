@@ -189,6 +189,8 @@ public class EntityMappings : IMappingSheet
 **CONS**  
 &nbsp;&nbsp;- If your source and destination types are identical or you can trust that follow defined property naming patterns, you will still have to write all of the assignations one by one. AutoMapper would infer them automatically.
 
+&nbsp;
+
 ## Get started
 
 1. Create one or many mapping collection sheets, implementing the **IMappingSheet** interface:
