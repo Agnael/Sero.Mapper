@@ -8,10 +8,17 @@ namespace Sero.Mapper.UnitTests.TestInfrastructure.Sheets
     {
         public void MappingRegistration(IMapperBuilder builder)
         {
-            builder.CreateMap<SrcTest, DestTest>((src, dest) => {
+            builder.CreateMap<SrcTest, DestTest>((src, dest) => 
+            {
                 dest.IdSrc = src.Id;
                 dest.NameSrc = src.Name;
                 dest.DescriptionSrc = src.Description;
+            });
+
+            builder.CreateMap<ComplexSrcTest, ComplexDestTest>((src, dest, mapper) =>
+            {
+                dest.ComplexResultName = src.Name;
+                dest.ComplexResultInternal = mapper.Map<DestTest>(src.Internal);
             });
         }
     }

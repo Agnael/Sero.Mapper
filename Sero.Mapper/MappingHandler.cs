@@ -4,8 +4,9 @@ using System.Text;
 
 namespace Sero.Mapper
 {
-    public delegate object Transformation(object obj, object destObj = null);
+    public delegate object Transformation(IMapper mapper, object obj, object destObj = null);
     public delegate void TransformationMask<TSrc, TDest>(TSrc src, TDest dest);
+    public delegate void TransformationMaskWithMapper<TSrc, TDest>(TSrc src, TDest dest, IMapper mapper);
 
     public class MappingHandler
     {

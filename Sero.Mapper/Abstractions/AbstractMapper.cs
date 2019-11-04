@@ -36,7 +36,7 @@ namespace Sero.Mapper
                 existingDestination = Activator.CreateInstance<TDestination>();
             }
 
-            TDestination dto = (TDestination)mapping.Transformation.Invoke(obj, existingDestination);
+            TDestination dto = (TDestination)mapping.Transformation.Invoke(this, obj, existingDestination);
             return dto;
         }
 

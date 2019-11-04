@@ -29,7 +29,7 @@ namespace Sero.Mapper.UnitTests.Mappers.BasicMapper
         [InlineData(null)]
         [InlineData("al43errrt")]
         [InlineData("[]A{d}asd}12{3--..")]
-        public void Single__WithDestination__Success(string propValue)
+        public void Single__ProvidingDestinationInstanceParameter__Success(string propValue)
         {
             SrcTest src = _srcBuilder
                                 .WithId(26)
@@ -68,6 +68,28 @@ namespace Sero.Mapper.UnitTests.Mappers.BasicMapper
             DestTest actual = sut.Map<DestTest>(src);
 
             Assert.Equal(expected, actual, _destComparer);
+        }
+
+        [Theory]
+        [InlineData("", "")]
+        [InlineData(null, null)]
+        [InlineData("al43errrt", "asdjj3")]
+        [InlineData("[]A{d}asd}12{3--..", "km342}}{}][--..")]
+        public void Single__WithInternalMapperUsage__Success(string wrapperName, string internalName)
+        {
+            ComplexSrcTest src = _complexSrcBuilder
+                                        .WithName(wrapperName)
+                                        .WithInternal(interno => interno.WithName(internalName));
+
+            ComplexDestTest expected = _complexDestBuilder
+                                        .WithName(wrapperName)
+                                        .WithInternal(interno => interno.WithName(internalName));
+
+            IMapper sut = _sutBuilder.WithDefaultMapping().Build();
+
+            ComplexDestTest actual = sut.Map<ComplexDestTest>(src);
+
+            Assert.Equal(expected, actual, _complexDestComparer);
         }
 
         //[Theory]

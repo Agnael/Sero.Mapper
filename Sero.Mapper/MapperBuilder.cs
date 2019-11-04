@@ -25,18 +25,9 @@ namespace Sero.Mapper
             instance.MappingRegistration(this);
         }
 
-        public void CreateMap<TSource, TDestination>(TransformationMask<TSource, TDestination> funcMask)
+        public void CreateMap<TSource, TDestination>(TransformationMaskWithMapper<TSource, TDestination> funcMask)
         {
-            var mapping = new MappingHandler(
-                typeof(TSource),
-                typeof(TDestination),
-                (obj, destObj) =>
-                {
-                    funcMask.Invoke((TSource)obj, (TDestination)destObj);
-                    return destObj;
-                }
-            );
-
+            var mapping = GetMappingHandler<TSource, TDestination>(funcMask);
             bool isExisting = _mappingList.Any(x => x.SourceType == mapping.SourceType
                                                     && x.DestinationType == mapping.DestinationType);
 
@@ -44,6 +35,48 @@ namespace Sero.Mapper
                 throw new Exception("Can't register this mapping. Another one was already registered for this SOURCE-DESTINATION pair.");
 
             _mappingList.Add(mapping);
+        }
+
+        public void CreateMap<TSource, TDestination>(TransformationMask<TSource, TDestination> funcMask)
+        {
+            var mapping = GetMappingHandler<TSource, TDestination>(funcMask);
+            bool isExisting = _mappingList.Any(x => x.SourceType == mapping.SourceType
+                                                    && x.DestinationType == mapping.DestinationType);
+
+            if (isExisting)
+                throw new Exception("Can't register this mapping. Another one was already registered for this SOURCE-DESTINATION pair.");
+
+            _mappingList.Add(mapping);
+        }
+
+        private MappingHandler GetMappingHandler<TSource, TDestination>(TransformationMask<TSource, TDestination> funcMask)
+        {
+            var mapping = new MappingHandler(
+                typeof(TSource),
+                typeof(TDestination),
+                (mapper, obj, destObj) =>
+                {
+                    funcMask.Invoke((TSource)obj, (TDestination)destObj);
+                    return destObj;
+                }
+            );
+
+            return mapping;
+        }
+
+        private MappingHandler GetMappingHandler<TSource, TDestination>(TransformationMaskWithMapper<TSource, TDestination> funcMask)
+        {
+            var mapping = new MappingHandler(
+                typeof(TSource),
+                typeof(TDestination),
+                (mapper, obj, destObj) =>
+                {
+                    funcMask.Invoke((TSource)obj, (TDestination)destObj, mapper);
+                    return destObj;
+                }
+            );
+
+            return mapping;
         }
 
         public IMapper Build()
