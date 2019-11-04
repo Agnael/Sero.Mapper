@@ -96,7 +96,7 @@ public class EntityAssembler
 }
 </pre>
 
-This approach can work, but it&apos;s usually verbose and your team must have a very clear naming concensous for the methods in the Assembler. Otherwise, you will end up with duplicate conversions registered, with slightly different names, or even names in different languages if your team is not english native.
+This approach can work, but your team must have a very clear naming concensous for the methods in the Assembler. Otherwise, you will end up with duplicate conversions registered, with slightly different names, or even names in different languages if your team is not english native.
 
 ---
 
