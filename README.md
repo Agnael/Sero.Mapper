@@ -58,7 +58,7 @@ Of course, this approach is the worst one.
 All the conversions are centralized in specialized classes:
 
 *OrderManager.cs*
-<pre language="csharp">
+<pre lang="csharp">
 public class OrderManager
 {
 	... ... ... ...
@@ -74,7 +74,7 @@ public class OrderManager
 </pre>
 
 *EntityAssembler.cs*
-<pre language="csharp">
+<pre lang="csharp">
 public class EntityAssembler
 {
 	... ... ... ...
@@ -105,7 +105,7 @@ A very powerful tool, you are pretty much covered if you go this route. However,
 - If you screw up anything in the definition you rely solely on AutoMapper&apos;s runtime error messages, which are very good, but sometimes they can be unclear or even misleading. 
 
 *OrderManager.cs*
-<pre language="csharp">
+<pre lang="csharp">
 public class OrderManager
 {
 	... ... ... ...
@@ -121,7 +121,7 @@ public class OrderManager
 </pre>
 
 *DtoToEntityProfile.cs*
-<pre language="csharp">
+<pre lang="csharp">
 public class DtoToEntityProfile : Profile
 {
 	public DtoToEntityProfile()
@@ -144,7 +144,7 @@ It&apos;s a middle ground between Assemblers and the AutoMapper kind of solution
 This example is a quick overview of the end result of using Sero.Mapper. Detailed setup instructions can be found in the next section.
 
 *OrderManager.cs*
-<pre language="csharp">
+<pre lang="csharp">
 public class OrderManager
 {
 	... ... ... ...
@@ -160,7 +160,7 @@ public class OrderManager
 </pre>
 
 *EntityMappings.cs*
-<pre language="csharp">
+<pre lang="csharp">
 public class EntityMappings : IMappingSheet
 {
     public void EntityMappings(IMapperBuilder builder)
@@ -179,7 +179,7 @@ public class EntityMappings : IMappingSheet
 
 &nbsp;
 
-#### Pros and Cons
+### Pros and Cons
 **PROS**
 &nbsp;&nbsp;- **Organization**: Your team now have a structure to follow, a key advantage when using AutoMapper that we really like and wanted to keep in this new mapper. The way of defining mappings and using them is normalized by the library and no team member can get creative and screw something up or waste his time creating a duplicate, like when creating Assembler methods.  
 &nbsp;&nbsp;- **Convenience**: In order to improve readability and writing speed, the instantiation and the returning of the destination instance is handled by Sero.Mapper, so you only need to write the actual assignations.    
