@@ -5,7 +5,7 @@ Lightweight mapping organization utility to keep track of type transformations.
 
 **Index**    
 &nbsp;&nbsp;[**The problem**](#the-problem)  
-&nbsp;&nbsp;[**Known solutions**](#Known solutions)  
+&nbsp;&nbsp;[**Known solutions**](#known-solutions)  
 &nbsp;&nbsp;&nbsp;&nbsp;[Repeating assignations whenever needed](#Repeating-assignations-whenever-needed)  
 &nbsp;&nbsp;&nbsp;&nbsp;[Assembler classes](#Assembler-classes)  
 &nbsp;&nbsp;&nbsp;&nbsp;[AutoMapper](#AutoMapper)  
