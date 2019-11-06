@@ -304,20 +304,7 @@ To provide an already existing destination, pass it as the second parameter of t
 ### Executing mappings inside of a transformation definition
 In classes with comples properties, you will sometimes need to execute a mapping inside of a definition. To do that, you can define your transformation providing a lambda with 3 parameters instead of 2, the third one is the current mapper instance.
 
-<pre lang="csharp">
-public class MySheet : IMappingSheet
-{
-   public void MappingRegistration(IMapperBuilder builder)
-   {
-      builder.CreateMap&lt;ComplexDTO, ComplexEntity&gt;((src, dest, mapper) => 
-      {
-         dest.prop1 = mapper.Map&lt;SomeType&gt;(src.prop1dto);
-      });
-   }
-}
-</pre>
-
-This example is assuming we already created new **OrderAddress** and **OrderAddressDTO** classes and our **Order** and **OrderDTO** are using them, respectively.
+This example assumes we already have new **OrderAddress** and **OrderAddressDTO** POCO classes created and our **Order** and **OrderDTO** are using them, respectively.
 <pre lang="csharp">
 public class MySheet : IMappingSheet
 {
