@@ -200,50 +200,151 @@ public class EntityMappings : IMappingSheet
 
 &nbsp;
 
-## Get started
-
+## Get started  
 ### Setting up Sero.Mapper
+1.  Install the "Sero.Mapper" NuGet package using the GUI or executing this command in the package manager console:
+```
+PM> Install-Package AutoMapper
+```
 
-### Mapping a single instance
-
-### Mapping collections
-
-### Overwriting an already existing destination instance
-
-### Executing mappings inside of a transformation definition
-
-
-
-
-
-
-
-1. Create one or many mapping collection sheets, implementing the **IMappingSheet** interface:
-```csharp
-public class YourMappings : IMappingSheet
+2. Create a new class implementing **IMappingSheet**, it only has 1 method.
+For our simple example (tl;dr: [this one](#the-problem)), we&apos;ll need to create a mapping to convert **OrderDTO** instances into **Order** instances: 
+<pre lang="csharp">
+public class MySheet : IMappingSheet
 {
    public void MappingRegistration(IMapperBuilder builder)
    {
-      builder.CreateMap<User, UserDTO>((user, userDto) => 
+      builder.CreateMap&lt;OrderDTO, Order&gt;((src, dest) => 
       {
-         userDto.IdUser = user.Id;
-         userDto.Username = user.Name;
-         userDto.UserBirthday = user.Birthdate;
+         if(src.User != null)
+            dest.Id = src.User.UserId;
+
+         if (src.Items != null)
+            dest.OrderItems = src.Items.Select(x => new OrderItem { IdItem = x }).ToList();
       });
    }
 }
-```
+</pre>
+The **CreateMap&lt;TSource, TDestination&gt;()** method takes the transformation as a lambda, which will define how the source and the destination types should be mapped. 
+You can create as many mappings you want in the same MappingRegistration method of the IMappingSheet.
 
-1. Instantiate a new SeroMapper instance using the **MapperBuilder** class and register your mapping sheet:
-```csharp
+3. Now we have a mapping sheet, but its just a definition, it&apos;s not actually being used. To execute it, we need to create an **IMapper** instance after registering the sheet:
+<pre lang="csharp">
 IMapper mapper = new MapperBuilder()
-                        .AddSheet<YourMappings>()
-                        .Build();
-```
-*You can also register mappings without a sheet, using the same **CreateMap** method of the MapperBuilder, used in the sheet implementations.*
+                          .AddSheet&lt;MySheet&gt;()
+                          .Build();
+</pre>
+If you are using ASP.NET Core, you can register the IMapper as a singleton service by using the **AddSeroMapper** extension method in your **ConfigureServices** method in the **Startup.cs** file.
+<pre lang="csharp">
+services.AddSeroMapper(config => config.AddSheet<MainSheet>());
+</pre>
+In this example we are registering only one mapping sheet, but you can add as many as you need.
+Once we have an IMapper instance available, we can start to actually execute our transformations.
 
-1. Use your transformation, using the **Map&lt;DestinationType&gt;** method:
-```csharp
-User user = new User { Id = 100, Name = "Test user", Birthdate = DateTime.UtcNow.AddYears(-20) };
-UserDto userDto = mapper.Map<UserDTO>(user);
-```
+### Mapping a single instance
+Using our created/injected IMapper instance, just run the conversion with the **Map&lt;TDestination&gt;() **method:
+
+*OrderManager.cs*
+<pre lang="csharp">
+public class OrderManager
+{
+   protected readonly IMapper _mapper;
+   protected readonly DbContext _db;
+   
+   public OrderManager(IMapper mapper, DbContext db)
+   {
+      _mapper = mapper;
+	  _db = db;
+   }
+   ...
+   /// Saves a new Order. 
+   public void SaveOrder(OrderDTO dto)
+   {
+      Order order = _mapper.Map&lt;Order&gt;(dto);  // &lt;&lt;&lt;&lt;&lt; CONVERSION
+      _db.Orders.Add(order);
+      _db.SaveChanges();
+   }
+   ...
+}
+</pre>
+
+### Mapping collections
+Use the  **MapList&lt;TDestination&gt;() **method instead:
+
+*OrderManager.cs*
+<pre lang="csharp">
+public class OrderManager
+{
+   protected readonly IMapper _mapper;
+   protected readonly DbContext _db;
+   
+   public OrderManager(IMapper mapper, DbContext db)
+   {
+      _mapper = mapper;
+	  _db = db;
+   }
+   ...
+   /// Saves a new Order. 
+   public void SaveOrderList(List&lt;OrderDTO&gt; dtoList)
+   {
+      ICollection&lt;Order&gt; order = _mapper.MapList&lt;Order&gt;(dtoList);  // &lt;&lt;&lt;&lt;&lt; CONVERSION
+      _db.Orders.Add(order);
+      _db.SaveChanges();
+   }
+   ...
+}
+</pre>
+
+
+### Overwriting an already existing destination instance
+Sometimes, it&apos;s useful to overwrite a destination instance with multiple different sources, which may be filling different properties of the destination.
+
+To provide an already existing destination, pass it as the second parameter of the Map&lt;TDestination&gt;() method, and you&apos;ll get the instance you provided with the transformations made by the mapping, all properties untouched by the transformation will have the original values your instance had.
+
+### Executing mappings inside of a transformation definition
+In classes with comples properties, you will sometimes need to execute a mapping inside of a definition. To do that, you can define your transformation providing a lambda with 3 parameters instead of 2, the third one is the current mapper instance.
+
+<pre lang="csharp">
+public class MySheet : IMappingSheet
+{
+   public void MappingRegistration(IMapperBuilder builder)
+   {
+      builder.CreateMap&lt;ComplexDTO, ComplexEntity&gt;((src, dest, mapper) => 
+      {
+         dest.prop1 = mapper.Map&lt;SomeType&gt;(src.prop1dto);
+      });
+   }
+}
+</pre>
+
+This example is assuming we already created new **OrderAddress** and **OrderAddressDTO** classes and our **Order** and **OrderDTO** are using them, respectively.
+<pre lang="csharp">
+public class MySheet : IMappingSheet
+{
+   public void MappingRegistration(IMapperBuilder builder)
+   {
+      builder.CreateMap&lt;OrderDTO, Order&gt;((src, dest, mapper) => 
+      {
+         if(src.User != null)
+            dest.Id = src.User.UserId;
+
+         if (src.Items != null)
+            dest.OrderItems = src.Items.Select(x => new OrderItem { IdItem = x }).ToList();
+	    
+	 // Here we use the injected mapper to execute a different mapping inside of this definition,
+	 // to get the "OrderAddress" instance from the source OrderAddressDTO property.
+	 if(src.AddressInfo != null)
+	    dest.Address = mapper.Map&lt;OrderAddress&gt;(src.AddressInfo);
+      });
+   
+      builder.CreateMap&lt;OrderAddressDTO, OrderAddress&gt;((src, dest) => 
+      {
+         dest.Address = src.StreetName;
+	 
+	 if(src.City != null)
+	    dest.IdCity = src.City.CityId;
+      });
+   }
+}
+</pre>
+Note that definition order is not important, since it&apos;s evaluated on runtime.
