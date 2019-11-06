@@ -1,7 +1,9 @@
 ![SERO.Mapper banner](https://i.imgur.com/SQOMHea.png)
 
 # Sero.Mapper
-Lightweight mapping organization utility to keep track of type transformations. 
+Lightweight mapping organization utility to keep track of type transformations.
+
+This is what you look for if all you need is a clear, simple, straight forward, debuggeable and organized way to write **manual** type mappings.
 
 **Index**    
 &nbsp;&nbsp;[**The problem**](#the-problem)  
@@ -12,6 +14,11 @@ Lightweight mapping organization utility to keep track of type transformations.
 &nbsp;&nbsp;[**The Sero.Mapper solution**](#The-SeroMapper-solution)  
 &nbsp;&nbsp;&nbsp;&nbsp;[Pros and Cons](#Pros-and-cons)  
 &nbsp;&nbsp;[**Get started**](#Get-started)  
+&nbsp;&nbsp;&nbsp;&nbsp;[Setting up Sero.Mapper](#Setting-up-SeroMapper) (PENDING)    
+&nbsp;&nbsp;&nbsp;&nbsp;[Mapping a single instance](#Mapping-a-single-instance) (PENDING)  
+&nbsp;&nbsp;&nbsp;&nbsp;[Mapping collections](#Mapping-collections) (PENDING)  
+&nbsp;&nbsp;&nbsp;&nbsp;[Overwriting an already existing destination instance](#Overwriting-an-already-existing-destination-instance) (PENDING)     
+&nbsp;&nbsp;&nbsp;&nbsp;[Executing mappings inside of a transformation definition](#Executing-mappings-inside-of-a-transformation-definition) (PENDING)  
 
 **Installation**  
 &nbsp;&nbsp;The quickest way to get the latest version is to add it to your project using **Nuget** [[Sero.Mapper](https://www.nuget.org/packages/Sero.Mapper/ "Sero.Mapper")]
@@ -21,7 +28,7 @@ Lightweight mapping organization utility to keep track of type transformations.
 ## The problem
 Let&apos;s say we receive a new customer order, in the OrderDTO format. We need to store it in our DB but to do that, our ORM forces us to **convert the OrderDTO instance into an Order instance** before trying to save it.
 
-As you can see, to be able to convert an OrderDTO, we also need to be able to convert it&apos;s complex properties. 
+As you can see, to be able to convert an OrderDTO, we also need to be able to convert it&apos;s properties. In this case, it will be rather simple because in order to save it, our ORM just happens to need only the FK ID (Order.IdUser) and we can ignore the Order.User property for saving, since in this case we assume this user already exists in the DB.
 
 ![Example classes diagram](https://i.imgur.com/172n43G.png)
 
@@ -194,6 +201,22 @@ public class EntityMappings : IMappingSheet
 &nbsp;
 
 ## Get started
+
+### Setting up Sero.Mapper
+
+### Mapping a single instance
+
+### Mapping collections
+
+### Overwriting an already existing destination instance
+
+### Executing mappings inside of a transformation definition
+
+
+
+
+
+
 
 1. Create one or many mapping collection sheets, implementing the **IMappingSheet** interface:
 ```csharp
