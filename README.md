@@ -269,7 +269,7 @@ public class OrderManager
 </pre>
 
 ### Mapping collections
-Use the  **MapList&lt;TDestination&gt;() **method instead:
+Use the **MapList&lt;TDestination&gt;()** method instead:
 
 *OrderManager.cs*
 <pre lang="csharp">
