@@ -7,7 +7,7 @@ namespace Sero.Mapper
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddSeroMapping(this IServiceCollection services, Action<IMapperBuilder> opts = null)
+        public static void AddSeroMapper(this IServiceCollection services, Action<IMapperBuilder> opts = null)
         {
             MapperBuilder builder = new MapperBuilder();
 

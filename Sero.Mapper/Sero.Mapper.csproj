@@ -8,8 +8,14 @@
     <RepositoryUrl>https://github.com/Agnael/Sero.Mapper</RepositoryUrl>
     <PackageTags>Mapper Type Mapping Mapping Organization</PackageTags>
     <Authors>Oleg Kuzmych</Authors>
-    <PackageLicenseExpression>GPL-3.0-only	</PackageLicenseExpression>
-    <Version>1.0.1</Version>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Version>1.0.7</Version>
+    <PackageIconUrl>https://i.imgur.com/gAfWXE8.jpg</PackageIconUrl>
+    <Description>
+      Lightweight mapping organization utility to keep track of type transformations.
+
+      This is what you look for if all you need is a clear, simple, straight forward, debuggeable and organized way to write manual type mappings.
+    </Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
