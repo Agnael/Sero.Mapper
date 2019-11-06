@@ -14,18 +14,20 @@ namespace Sero.Mapper
             _mappingList = new List<MappingHandler>();
         }
 
-        public void AddSheet(IMappingSheet sheet)
+        public MapperBuilder AddSheet(IMappingSheet sheet)
         {
             sheet.MappingRegistration(this);
+            return this;
         }
 
-        public void AddSheet<T>() where T : IMappingSheet
+        public MapperBuilder AddSheet<T>() where T : IMappingSheet
         {
             IMappingSheet instance = Activator.CreateInstance<T>();
             instance.MappingRegistration(this);
+            return this;
         }
 
-        public void CreateMap<TSource, TDestination>(TransformationMaskWithMapper<TSource, TDestination> funcMask)
+        public MapperBuilder CreateMap<TSource, TDestination>(TransformationMaskWithMapper<TSource, TDestination> funcMask)
         {
             var mapping = GetMappingHandler<TSource, TDestination>(funcMask);
             bool isExisting = _mappingList.Any(x => x.SourceType == mapping.SourceType
@@ -35,9 +37,10 @@ namespace Sero.Mapper
                 throw new Exception("Can't register this mapping. Another one was already registered for this SOURCE-DESTINATION pair.");
 
             _mappingList.Add(mapping);
+            return this;
         }
 
-        public void CreateMap<TSource, TDestination>(TransformationMask<TSource, TDestination> funcMask)
+        public MapperBuilder CreateMap<TSource, TDestination>(TransformationMask<TSource, TDestination> funcMask)
         {
             var mapping = GetMappingHandler<TSource, TDestination>(funcMask);
             bool isExisting = _mappingList.Any(x => x.SourceType == mapping.SourceType
@@ -47,6 +50,7 @@ namespace Sero.Mapper
                 throw new Exception("Can't register this mapping. Another one was already registered for this SOURCE-DESTINATION pair.");
 
             _mappingList.Add(mapping);
+            return this;
         }
 
         private MappingHandler GetMappingHandler<TSource, TDestination>(TransformationMask<TSource, TDestination> funcMask)

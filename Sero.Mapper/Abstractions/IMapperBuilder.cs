@@ -6,11 +6,11 @@ namespace Sero.Mapper
 {
     public interface IMapperBuilder
     {
-        void CreateMap<TSource, TDestination>(TransformationMask<TSource, TDestination> funcMask);
-        void CreateMap<TSource, TDestination>(TransformationMaskWithMapper<TSource, TDestination> funcMask);
+        MapperBuilder CreateMap<TSource, TDestination>(TransformationMask<TSource, TDestination> funcMask);
+        MapperBuilder CreateMap<TSource, TDestination>(TransformationMaskWithMapper<TSource, TDestination> funcMask);
 
-        void AddSheet(IMappingSheet sheet);
-        void AddSheet<T>() where T : IMappingSheet;
+        MapperBuilder AddSheet(IMappingSheet sheet);
+        MapperBuilder AddSheet<T>() where T : IMappingSheet;
 
         IMapper Build();
     }
