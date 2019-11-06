@@ -318,7 +318,7 @@ public class MySheet : IMappingSheet
          if (src.Items != null)
             dest.OrderItems = src.Items.Select(x => new OrderItem { IdItem = x }).ToList();
 	    
-	 // Here we use the injected mapper to execute a different mapping inside of this definition,
+	 // We use the injected mapper to execute a different mapping inside of this definition,
 	 // to get the "OrderAddress" instance from the source OrderAddressDTO property.
 	 if(src.AddressInfo != null)
 	    dest.Address = mapper.Map&lt;OrderAddress&gt;(src.AddressInfo);
