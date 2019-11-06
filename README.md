@@ -15,9 +15,10 @@ This is what you look for if all you need is a clear, simple, straight forward, 
 &nbsp;&nbsp;&nbsp;&nbsp;[Pros and Cons](#Pros-and-cons)  
 &nbsp;&nbsp;[**Get started**](#Get-started)  
 &nbsp;&nbsp;&nbsp;&nbsp;[Setting up Sero.Mapper](#Setting-up-SeroMapper) (PENDING)    
+&nbsp;&nbsp;&nbsp;&nbsp;[Mapping a single instance](#Mapping-a-single-instance) (PENDING)  
 &nbsp;&nbsp;&nbsp;&nbsp;[Mapping collections](#Mapping-collections) (PENDING)  
 &nbsp;&nbsp;&nbsp;&nbsp;[Overwriting an already existing destination instance](#Overwriting-an-already-existing-destination-instance) (PENDING)     
-&nbsp;&nbsp;&nbsp;&nbsp;[Executing a mapping inside another&apos;s transformation definition](#Executing-a-mapping-inside-another&apos;s-transformation-definition) (PENDING)  
+&nbsp;&nbsp;&nbsp;&nbsp;[Executing mappings inside of a transformation definition](#Executing-mappings-inside-of-a-transformation-definition) (PENDING)  
 
 **Installation**  
 &nbsp;&nbsp;The quickest way to get the latest version is to add it to your project using **Nuget** [[Sero.Mapper](https://www.nuget.org/packages/Sero.Mapper/ "Sero.Mapper")]
@@ -200,6 +201,22 @@ public class EntityMappings : IMappingSheet
 &nbsp;
 
 ## Get started
+
+### Setting up Sero.Mapper
+
+### Mapping a single instance
+
+### Mapping collections
+
+### Overwriting an already existing destination instance
+
+### Executing mappings inside of a transformation definition
+
+
+
+
+
+
 
 1. Create one or many mapping collection sheets, implementing the **IMappingSheet** interface:
 ```csharp
