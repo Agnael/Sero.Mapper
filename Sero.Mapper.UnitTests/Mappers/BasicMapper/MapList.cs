@@ -23,7 +23,7 @@ namespace Sero.Mapper.UnitTests.Mappers.BasicMapper
             foreach (var value in propValues)
                 expectedList.Add(new DestTest(5, value, value));
 
-            IMapper sut = _sutBuilder.WithDefaultMapping().Build();
+            Mapper sut = _sutBuilder.WithDefaultMapping().Build();
 
             // Execute
             ICollection<DestTest> actualList = sut.MapList<DestTest>(srcList);
@@ -33,23 +33,15 @@ namespace Sero.Mapper.UnitTests.Mappers.BasicMapper
         }
 
         [Fact]
-        public void Collection__WithNullElements__Success()
+        public void Collection__WithNullElements__NullItemsInCollectionException()
         {
             IList<SrcTest> srcList = new List<SrcTest>();
-            IList<DestTest> expectedList = new List<DestTest>();
-
             srcList.Add(_srcBuilder.WithName("elem1"));
             srcList.Add(null);
             srcList.Add(_srcBuilder.WithName("elem3"));
 
-            expectedList.Add(_destBuilder.WithName("elem1"));
-            expectedList.Add(null);
-            expectedList.Add(_destBuilder.WithName("elem3"));
-
-            IMapper sut = _sutBuilder.WithDefaultMapping().Build();
-            ICollection<DestTest> actualList = sut.MapList<DestTest>(srcList);
-            
-            Assert.Equal<DestTest>(expectedList, actualList, _destComparer);
+            Mapper sut = _sutBuilder.WithDefaultMapping().Build();
+            Assert.Throws<NullItemsInCollectionException>(() => sut.MapList<DestTest>(srcList));
         }
     }
 }

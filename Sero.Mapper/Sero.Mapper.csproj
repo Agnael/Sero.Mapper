@@ -9,7 +9,7 @@
     <PackageTags>Mapper Type Mapping Mapping Organization</PackageTags>
     <Authors>Oleg Kuzmych</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>1.0.8</Version>
+    <Version>1.1.0</Version>
     <PackageIconUrl>https://i.imgur.com/gAfWXE8.jpg</PackageIconUrl>
     <Description>
       Lightweight mapping organization utility to keep track of type transformations.

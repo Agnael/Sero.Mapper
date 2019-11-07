@@ -6,7 +6,7 @@ namespace Sero.Mapper.UnitTests.TestInfrastructure.Sheets
 {
     public class DefaultTestMappings : IMappingSheet
     {
-        public void MappingRegistration(IMapperBuilder builder)
+        public void MappingRegistration(MapperBuilder builder)
         {
             builder.CreateMap<SrcTest, DestTest>((src, dest) => 
             {

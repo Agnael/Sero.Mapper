@@ -8,7 +8,7 @@ namespace Sero.Mapper.UnitTests
 {
     internal class BasicMapperBuilder
     {
-        private IMapperBuilder _mapperbuilder;
+        private MapperBuilder _mapperbuilder;
 
         public BasicMapperBuilder()
         {
@@ -27,7 +27,7 @@ namespace Sero.Mapper.UnitTests
             return this;
         }
 
-        internal IMapper Build()
+        internal Mapper Build()
         {
             return _mapperbuilder.Build();
         }

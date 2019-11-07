@@ -5,7 +5,10 @@ using System.Text;
 
 namespace Sero.Mapper
 {
-    public class MapperBuilder : IMapperBuilder
+    /// <summary>
+    ///     Registers and holds mapping transformations to finally create a Mapper instance with them.
+    /// </summary>
+    public class MapperBuilder
     {
         private List<MappingHandler> _mappingList;
 
@@ -14,12 +17,24 @@ namespace Sero.Mapper
             _mappingList = new List<MappingHandler>();
         }
 
+        /// <summary>
+        ///     Takes an IMappingSheet implementing class and registers it's mapping definitions.
+        /// </summary>
+        /// <param name="sheet">
+        ///     IMappingSheet implementing class.
+        /// </param>
         public MapperBuilder AddSheet(IMappingSheet sheet)
         {
             sheet.MappingRegistration(this);
             return this;
         }
-
+        
+        /// <summary>
+        ///     Convenience method that only needs the IMappingSheet implementation class name to register it's definitions.
+        /// </summary>
+        /// <typeparam name="T">
+        ///     A class that implements IMappingSheet.
+        /// </typeparam>
         public MapperBuilder AddSheet<T>() where T : IMappingSheet
         {
             IMappingSheet instance = Activator.CreateInstance<T>();
@@ -27,6 +42,21 @@ namespace Sero.Mapper
             return this;
         }
 
+        /// <summary>
+        ///     Creates a single mapping definition for the SOURCE-DESTINATION types provided.
+        ///     This method overload allows you to register a transformation lambda that receives the current Mapper instance, to
+        ///     execute mappings in the lambda.
+        /// </summary>
+        /// <typeparam name="TSource">
+        ///     Source type that the transformation should receive.
+        /// </typeparam>
+        /// <typeparam name="TDestination">
+        ///     Destination type that the transformation must return.
+        /// </typeparam>
+        /// <param name="funcMask">
+        ///     Lambda that takes 3 parameters: (TSource src, TDestination dest, Mapper mapper) and defines the transformation you need. It must not 
+        ///     return the resulting transformed "dest" parameter, the library takes care of that.
+        /// </param>
         public MapperBuilder CreateMap<TSource, TDestination>(TransformationMaskWithMapper<TSource, TDestination> funcMask)
         {
             var mapping = GetMappingHandler<TSource, TDestination>(funcMask);
@@ -34,12 +64,25 @@ namespace Sero.Mapper
                                                     && x.DestinationType == mapping.DestinationType);
 
             if (isExisting)
-                throw new Exception("Can't register this mapping. Another one was already registered for this SOURCE-DESTINATION pair.");
+                throw new DuplicatedMappingException<TSource, TDestination>();
 
             _mappingList.Add(mapping);
             return this;
         }
 
+        /// <summary>
+        ///     Creates a single mapping definition for the SOURCE-DESTINATION types provided.
+        /// </summary>
+        /// <typeparam name="TSource">
+        ///     Source type that the transformation should receive.
+        /// </typeparam>
+        /// <typeparam name="TDestination">
+        ///     Destination type that the transformation must return.
+        /// </typeparam>
+        /// <param name="funcMask">
+        ///     Lambda that takes 3 parameters: (TSource src, TDestination dest) and defines the transformation you need. It must not 
+        ///     return the resulting transformed "dest" parameter, the library takes care of that.
+        /// </param>
         public MapperBuilder CreateMap<TSource, TDestination>(TransformationMask<TSource, TDestination> funcMask)
         {
             var mapping = GetMappingHandler<TSource, TDestination>(funcMask);
@@ -53,6 +96,9 @@ namespace Sero.Mapper
             return this;
         }
 
+        /// <summary>
+        /// Builds and returns a MappingHandler instance.
+        /// </summary>
         private MappingHandler GetMappingHandler<TSource, TDestination>(TransformationMask<TSource, TDestination> funcMask)
         {
             var mapping = new MappingHandler(
@@ -68,6 +114,9 @@ namespace Sero.Mapper
             return mapping;
         }
 
+        /// <summary>
+        /// Builds and returns a MappingHandler instance.
+        /// </summary>
         private MappingHandler GetMappingHandler<TSource, TDestination>(TransformationMaskWithMapper<TSource, TDestination> funcMask)
         {
             var mapping = new MappingHandler(
@@ -83,9 +132,12 @@ namespace Sero.Mapper
             return mapping;
         }
 
-        public IMapper Build()
+        /// <summary>
+        /// Uses the MapperBuilder configurations to build a Mapper instance.
+        /// </summary>
+        public Mapper Build()
         {
-            return new BasicMapper(_mappingList);
+            return new Mapper(_mappingList);
         }
     }
 }
