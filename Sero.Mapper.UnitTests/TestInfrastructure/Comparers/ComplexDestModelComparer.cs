@@ -3,18 +3,18 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Sero.Mapper.UnitTests.Comparers
+namespace Sero.Mapper.Tests
 {
-    internal class ComplexDestTestComparer : IEqualityComparer<ComplexDestTest>
+    internal class ComplexDestModelComparer : IEqualityComparer<ComplexDestModel>
     {
-        private DestTestComparer _destComparer;
+        private DestModelComparer _destComparer;
 
-        public ComplexDestTestComparer(DestTestComparer destTestComparer)
+        public ComplexDestModelComparer(DestModelComparer destTestComparer)
         {
             _destComparer = destTestComparer;
         }
 
-        public bool Equals(ComplexDestTest expected, ComplexDestTest actual)
+        public bool Equals(ComplexDestModel expected, ComplexDestModel actual)
         {
             if (expected == null ^ actual == null)
                 return false;
@@ -26,7 +26,7 @@ namespace Sero.Mapper.UnitTests.Comparers
                 && _destComparer.Equals(expected.ComplexResultInternal, actual.ComplexResultInternal);
         }
 
-        public int GetHashCode(ComplexDestTest obj)
+        public int GetHashCode(ComplexDestModel obj)
         {
             return obj.ComplexResultName.GetHashCode()
                 ^ _destComparer.GetHashCode(obj.ComplexResultInternal);

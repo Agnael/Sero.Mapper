@@ -1,10 +1,9 @@
-﻿using Sero.Mapper.UnitTests.Comparers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using Xunit;
 
-namespace Sero.Mapper.UnitTests.Mappers.BasicMapper
+namespace Sero.Mapper.Tests.MapperTests
 {
     public class Map : BasicMapperFixture
     {
@@ -15,11 +14,11 @@ namespace Sero.Mapper.UnitTests.Mappers.BasicMapper
         [InlineData("[]A{d}asd}12{3--..")]
         public void Single__Success(string propValue)
         {
-            SrcTest src = _srcBuilder;
-            DestTest expected = _destBuilder;
+            SrcModel src = _srcBuilder.WithName(propValue);
+            DestModel expected = _destBuilder.WithName(propValue);
 
             var sut = _sutBuilder.WithDefaultMapping().Build();
-            var actual = sut.Map<DestTest>(src);
+            var actual = sut.Map<DestModel>(src);
 
             Assert.Equal(expected, actual, _destComparer);
         }
@@ -31,37 +30,38 @@ namespace Sero.Mapper.UnitTests.Mappers.BasicMapper
         [InlineData("[]A{d}asd}12{3--..")]
         public void Single__ProvidingDestinationInstanceParameter__Success(string propValue)
         {
-            SrcTest src = _srcBuilder
+            SrcModel src = _srcBuilder
                                 .WithId(26)
                                 .WithName("originalName")
                                 .WithDescription("originalDescription").Build();
 
-            SrcNameTest src2 = new SrcNameTest(propValue);
+            SrcNameModel src2 = new SrcNameModel(propValue);
 
-            DestTest expected = _destBuilder
+            DestModel expected = _destBuilder
                                 .WithId(26)
                                 .WithName(propValue)
                                 .WithDescription("originalDescription");
 
             Mapper sut = _sutBuilder
                             .WithDefaultMapping()
-                            .WithMapping<SrcNameTest, DestTest>((source, dest) => 
+                            .WithMapping<SrcNameModel, DestModel>((source, dest) => 
                             {
                                 dest.NameSrc = source.Name;
                             })
                             .Build();
 
-            DestTest actual = sut.Map<DestTest>(src);
-            actual = sut.Map<DestTest>(src2, actual);
+            DestModel actual = sut.Map<DestModel>(src);
+            actual = sut.Map<DestModel>(src2, actual);
 
             Assert.Equal(expected, actual, _destComparer);
         }
 
         [Fact]
-        public void Single__Null__ArgumentNullException()
+        public void Single__ProvidingDestinationInstanceParameterAsNull__ArgumentNullException()
         {
+            SrcModel src = _srcBuilder;
             Mapper sut = _sutBuilder.WithDefaultMapping().Build();
-            Assert.Throws<ArgumentNullException>(() => sut.Map<DestTest>(null));
+            Assert.Throws<ArgumentNullException>(() => sut.Map<DestModel>(src, null));
         }
 
         [Theory]
@@ -71,19 +71,34 @@ namespace Sero.Mapper.UnitTests.Mappers.BasicMapper
         [InlineData("[]A{d}asd}12{3--..", "km342}}{}][--..")]
         public void Single__WithInternalMapperUsage__Success(string wrapperName, string internalName)
         {
-            ComplexSrcTest src = _complexSrcBuilder
+            ComplexSrcModel src = _complexSrcBuilder
                                         .WithName(wrapperName)
                                         .WithInternal(interno => interno.WithName(internalName));
 
-            ComplexDestTest expected = _complexDestBuilder
+            ComplexDestModel expected = _complexDestBuilder
                                         .WithName(wrapperName)
                                         .WithInternal(interno => interno.WithName(internalName));
 
             Mapper sut = _sutBuilder.WithDefaultMapping().Build();
 
-            ComplexDestTest actual = sut.Map<ComplexDestTest>(src);
+            ComplexDestModel actual = sut.Map<ComplexDestModel>(src);
 
             Assert.Equal(expected, actual, _complexDestComparer);
+        }
+
+        [Fact]
+        public void Single__Null__ArgumentNullException()
+        {
+            Mapper sut = _sutBuilder.WithDefaultMapping().Build();
+            Assert.Throws<ArgumentNullException>(() => sut.Map<DestModel>(null));
+        }
+
+        [Fact]
+        public void Single__UnmappedTransformation__MissingMappingException()
+        {
+            SrcModel src = _srcBuilder;
+            Mapper sut = _sutBuilder.Build();
+            Assert.Throws<MissingMappingException>(() => sut.Map<DestModel>(src));
         }
     }
 }

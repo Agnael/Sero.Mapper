@@ -2,44 +2,44 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Sero.Mapper.UnitTests.ModelBuilders
+namespace Sero.Mapper.Tests
 {
-    internal class DestTestBuilder
+    internal class SrcModelBuilder
     {
         private int _id;
         private string _name;
         private string _description;
 
-        public DestTestBuilder()
+        public SrcModelBuilder()
         {
             _id = 100;
             _name = "Test name";
             _description = "Test description";
         }
 
-        internal DestTestBuilder WithId(int id)
+        internal SrcModelBuilder WithId(int id)
         {
             _id = id;
             return this;
         }
 
-        internal DestTestBuilder WithName(string name)
+        internal SrcModelBuilder WithName(string name)
         {
             _name = name;
             return this;
         }
 
-        internal DestTestBuilder WithDescription(string desc)
+        internal SrcModelBuilder WithDescription(string desc)
         {
             _description = desc;
             return this;
         }
 
-        internal DestTest Build()
+        internal SrcModel Build()
         {
-            return new DestTest(_id, _name, _description);
+            return new SrcModel(_id, _name, _description);
         }
 
-        public static implicit operator DestTest(DestTestBuilder builder) => builder.Build();
+        public static implicit operator SrcModel(SrcModelBuilder builder) => builder.Build();
     }
 }

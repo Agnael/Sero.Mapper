@@ -90,7 +90,7 @@ namespace Sero.Mapper
                                                     && x.DestinationType == mapping.DestinationType);
 
             if (isExisting)
-                throw new Exception("Can't register this mapping. Another one was already registered for this SOURCE-DESTINATION pair.");
+                throw new DuplicatedMappingException<TSource, TDestination>();
 
             _mappingList.Add(mapping);
             return this;

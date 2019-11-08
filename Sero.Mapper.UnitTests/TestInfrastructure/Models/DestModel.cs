@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Sero.Mapper.UnitTests
+namespace Sero.Mapper.Tests
 {
-    internal class DestTest
+    internal class DestModel
     {
         public int IdSrc { get; set; }
         public string NameSrc { get; set; }
         public string DescriptionSrc { get; set; }
 
-        public DestTest() { }
-        public DestTest(int id, string name, string description)
+        public DestModel() { }
+        public DestModel(int id, string name, string description)
         {
             IdSrc = id;
             NameSrc = name;

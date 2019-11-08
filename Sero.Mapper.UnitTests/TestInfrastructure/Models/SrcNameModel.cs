@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Sero.Mapper.UnitTests
+namespace Sero.Mapper.Tests
 {
-    internal class SrcNameTest
+    internal class SrcNameModel
     {
         public string Name { get; set; }
 
-        public SrcNameTest() { }
-        public SrcNameTest(string name)
+        public SrcNameModel() { }
+        public SrcNameModel(string name)
         {
             Name = name;
         }

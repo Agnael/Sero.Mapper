@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Xunit;
 
-namespace Sero.Mapper.UnitTests.Mappers.BasicMapper
+namespace Sero.Mapper.Tests.MapperTests
 {
     public class MapList : BasicMapperFixture
     {
@@ -14,34 +14,34 @@ namespace Sero.Mapper.UnitTests.Mappers.BasicMapper
         public void Collection_Success(params string[] propValues)
         {
             // Arrange
-            IList<SrcTest> srcList = new List<SrcTest>();
-            IList<DestTest> expectedList = new List<DestTest>();
+            IList<SrcModel> srcList = new List<SrcModel>();
+            IList<DestModel> expectedList = new List<DestModel>();
 
             foreach (var value in propValues)
-                srcList.Add(new SrcTest(5, value, value));
+                srcList.Add(new SrcModel(5, value, value));
 
             foreach (var value in propValues)
-                expectedList.Add(new DestTest(5, value, value));
+                expectedList.Add(new DestModel(5, value, value));
 
             Mapper sut = _sutBuilder.WithDefaultMapping().Build();
 
             // Execute
-            ICollection<DestTest> actualList = sut.MapList<DestTest>(srcList);
+            ICollection<DestModel> actualList = sut.MapList<DestModel>(srcList);
 
             // Assert
-            Assert.Equal<DestTest>(expectedList, actualList, _destComparer);
+            Assert.Equal<DestModel>(expectedList, actualList, _destComparer);
         }
 
         [Fact]
         public void Collection__WithNullElements__NullItemsInCollectionException()
         {
-            IList<SrcTest> srcList = new List<SrcTest>();
+            IList<SrcModel> srcList = new List<SrcModel>();
             srcList.Add(_srcBuilder.WithName("elem1"));
             srcList.Add(null);
             srcList.Add(_srcBuilder.WithName("elem3"));
 
             Mapper sut = _sutBuilder.WithDefaultMapping().Build();
-            Assert.Throws<NullItemsInCollectionException>(() => sut.MapList<DestTest>(srcList));
+            Assert.Throws<NullItemsInCollectionException>(() => sut.MapList<DestModel>(srcList));
         }
     }
 }

@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Sero.Mapper.UnitTests
+namespace Sero.Mapper.Tests
 {
-    internal class ComplexDestTest
+    internal class ComplexDestModel
     {
         public string ComplexResultName { get; set; }
-        public DestTest ComplexResultInternal { get; set; }
+        public DestModel ComplexResultInternal { get; set; }
 
-        public ComplexDestTest() { }
-        public ComplexDestTest(string name, DestTest interior)
+        public ComplexDestModel() { }
+        public ComplexDestModel(string name, DestModel interior)
         {
             ComplexResultName = name;
             ComplexResultInternal = interior;

@@ -2,23 +2,23 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Sero.Mapper.UnitTests.TestInfrastructure.Sheets
+namespace Sero.Mapper.Tests
 {
-    public class DefaultTestMappings : IMappingSheet
+    public class DefaultSheet : IMappingSheet
     {
         public void MappingRegistration(MapperBuilder builder)
         {
-            builder.CreateMap<SrcTest, DestTest>((src, dest) => 
+            builder.CreateMap<SrcModel, DestModel>((src, dest) => 
             {
                 dest.IdSrc = src.Id;
                 dest.NameSrc = src.Name;
                 dest.DescriptionSrc = src.Description;
             });
 
-            builder.CreateMap<ComplexSrcTest, ComplexDestTest>((src, dest, mapper) =>
+            builder.CreateMap<ComplexSrcModel, ComplexDestModel>((src, dest, mapper) =>
             {
                 dest.ComplexResultName = src.Name;
-                dest.ComplexResultInternal = mapper.Map<DestTest>(src.Internal);
+                dest.ComplexResultInternal = mapper.Map<DestModel>(src.Internal);
             });
         }
     }

@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Sero.Mapper.UnitTests.Comparers
+namespace Sero.Mapper.Tests
 {
-    internal class DestTestComparer : IEqualityComparer<DestTest>
+    internal class DestModelComparer : IEqualityComparer<DestModel>
     {
-        public bool Equals(DestTest expected, DestTest actual)
+        public bool Equals(DestModel expected, DestModel actual)
         {
             if (expected == null ^ actual == null)
                 return false;
@@ -19,7 +19,7 @@ namespace Sero.Mapper.UnitTests.Comparers
                 && expected.DescriptionSrc == actual.DescriptionSrc;
         }
 
-        public int GetHashCode(DestTest obj)
+        public int GetHashCode(DestModel obj)
         {
             return obj.IdSrc.GetHashCode()
                 ^ obj.NameSrc.GetHashCode()
