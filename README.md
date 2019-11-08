@@ -172,7 +172,7 @@ public class OrderManager
 <pre lang="csharp">
 public class EntityMappings : IMappingSheet
 {
-   public void EntityMappings(IMapperBuilder builder)
+   public void EntityMappings(MapperBuilder builder)
    {
       builder.CreateMap&lt;OrderDTO, Order&gt;((entity, dto) => 
       {
@@ -212,7 +212,7 @@ For our simple example (tl;dr: [this one](#the-problem)), we&apos;ll need to cre
 <pre lang="csharp">
 public class MySheet : IMappingSheet
 {
-   public void MappingRegistration(IMapperBuilder builder)
+   public void MappingRegistration(MapperBuilder builder)
    {
       builder.CreateMap&lt;OrderDTO, Order&gt;((src, dest) => 
       {
@@ -228,30 +228,30 @@ public class MySheet : IMappingSheet
 The **CreateMap&lt;TSource, TDestination&gt;()** method takes the transformation as a lambda, which will define how the source and the destination types should be mapped. 
 You can create as many mappings you want in the same MappingRegistration method of the IMappingSheet.
 
-3. Now we have a mapping sheet, but its just a definition, it&apos;s not actually being used. To execute it, we need to create an **IMapper** instance after registering the sheet:
+3. Now we have a mapping sheet, but its just a definition, it&apos;s not actually being used. To execute it, we need to create an **Mapper** instance after registering the sheet:
 <pre lang="csharp">
-IMapper mapper = new MapperBuilder()
+Mapper mapper = new MapperBuilder()
                           .AddSheet&lt;MySheet&gt;()
                           .Build();
 </pre>
-If you are using ASP.NET Core, you can register the IMapper as a singleton service by using the **AddSeroMapper** extension method in your **ConfigureServices** method in the **Startup.cs** file.
+If you are using ASP.NET Core, you can register the Mapper as a singleton service by using the **AddSeroMapper** extension method in your **ConfigureServices** method in the **Startup.cs** file.
 <pre lang="csharp">
 services.AddSeroMapper(config => config.AddSheet<MainSheet>());
 </pre>
 In this example we are registering only one mapping sheet, but you can add as many as you need.
-Once we have an IMapper instance available, we can start to actually execute our transformations.
+Once we have an Mapper instance available, we can start to actually execute our transformations.
 
 ### Mapping a single instance
-Using our created/injected IMapper instance, just run the conversion with the **Map&lt;TDestination&gt;() **method:
+Using our created/injected Mapper instance, just run the conversion with the **Map&lt;TDestination&gt;() **method:
 
 *OrderManager.cs*
 <pre lang="csharp">
 public class OrderManager
 {
-   protected readonly IMapper _mapper;
+   protected readonly Mapper _mapper;
    protected readonly DbContext _db;
    
-   public OrderManager(IMapper mapper, DbContext db)
+   public OrderManager(Mapper mapper, DbContext db)
    {
       _mapper = mapper;
 	  _db = db;
@@ -275,10 +275,10 @@ Use the **MapList&lt;TDestination&gt;()** method instead:
 <pre lang="csharp">
 public class OrderManager
 {
-   protected readonly IMapper _mapper;
+   protected readonly Mapper _mapper;
    protected readonly DbContext _db;
    
-   public OrderManager(IMapper mapper, DbContext db)
+   public OrderManager(Mapper mapper, DbContext db)
    {
       _mapper = mapper;
 	  _db = db;
@@ -308,7 +308,7 @@ This example assumes we already have new **OrderAddress** and **OrderAddressDTO*
 <pre lang="csharp">
 public class MySheet : IMappingSheet
 {
-   public void MappingRegistration(IMapperBuilder builder)
+   public void MappingRegistration(MapperBuilder builder)
    {
       builder.CreateMap&lt;OrderDTO, Order&gt;((src, dest, mapper) => 
       {
