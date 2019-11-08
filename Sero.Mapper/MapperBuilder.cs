@@ -38,7 +38,10 @@ namespace Sero.Mapper
         public MapperBuilder AddSheet<T>() where T : IMappingSheet
         {
             IMappingSheet instance = Activator.CreateInstance<T>();
+
+            // Passes itself to the IMappingSheet implementation so it performs bulk registrations
             instance.MappingRegistration(this);
+
             return this;
         }
 
@@ -97,7 +100,7 @@ namespace Sero.Mapper
         }
 
         /// <summary>
-        /// Builds and returns a MappingHandler instance.
+        /// Builds and returns a MappingHandler instance. Convenience method to avoid repeating code.
         /// </summary>
         private MappingHandler GetMappingHandler<TSource, TDestination>(TransformationMask<TSource, TDestination> funcMask)
         {
@@ -115,7 +118,7 @@ namespace Sero.Mapper
         }
 
         /// <summary>
-        /// Builds and returns a MappingHandler instance.
+        /// Builds and returns a MappingHandler instance. Convenience method to avoid repeating code.
         /// </summary>
         private MappingHandler GetMappingHandler<TSource, TDestination>(TransformationMaskWithMapper<TSource, TDestination> funcMask)
         {

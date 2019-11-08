@@ -19,6 +19,26 @@ namespace Sero.Mapper
         }
 
         /// <summary>
+        ///     Convenience method to avoid repeated code
+        /// </summary>
+        private TDestination MapInternal<TDestination>(object src, object destBase)
+        {
+            Type sourceType = src.GetType();
+            Type destinationType = typeof(TDestination);
+
+            var mapping = MappingHandlers.FirstOrDefault(x => x.SourceType == sourceType
+                                                            && x.DestinationType == destinationType);
+
+            if (mapping == null)
+                throw new MissingMappingException(sourceType, destinationType);
+            
+            // Final destination instance, with the user's transformation applied
+            TDestination destination = (TDestination)mapping.Transformation.Invoke(this, src, destBase);
+
+            return destination;
+        }
+
+        /// <summary>
         ///     Transforms an object instance into a new instance of a different type.
         /// </summary>
         /// <typeparam name="TDestination">
@@ -40,18 +60,11 @@ namespace Sero.Mapper
         {
             if (sourceObj == null)
                 throw new ArgumentNullException("sourceObj");
-
-            Type sourceType = sourceObj.GetType();
-            Type destinationType = typeof(TDestination);
-
-            var mapping = MappingHandlers.FirstOrDefault(x => x.SourceType == sourceType
-                                                            && x.DestinationType == destinationType);
-
-            if (mapping == null) 
-                throw new MissingMappingException(sourceType, destinationType);
-
+            
+            // Since the user is not trying to override an existing destination instance, we have to provide it.
+            // Having this instance allows to inject it into user's transformation lambda, helping to reduce boilerplate code.
             TDestination destinationBase = Activator.CreateInstance<TDestination>();
-            TDestination destination = (TDestination)mapping.Transformation.Invoke(this, sourceObj, destinationBase);
+            TDestination destination = this.MapInternal<TDestination>(sourceObj, destinationBase);
 
             return destination;
         }
@@ -86,17 +99,7 @@ namespace Sero.Mapper
             if (EqualityComparer<TDestination>.Default.Equals(existingDestinationObj, default(TDestination)))
                 throw new ArgumentNullException("existingDestinationObj");
 
-            Type sourceType = sourceObj.GetType();
-            Type destinationType = typeof(TDestination);
-
-            var mapping = MappingHandlers.FirstOrDefault(x => x.SourceType == sourceType
-                                                            && x.DestinationType == destinationType);
-
-            if (mapping == null)
-                throw new Exception("There is no mapping defined for this SOURCE-DESTINATION pair.");
-
-
-            TDestination dto = (TDestination)mapping.Transformation.Invoke(this, sourceObj, existingDestinationObj);
+            TDestination dto = this.MapInternal<TDestination>(sourceObj, existingDestinationObj);
             return dto;
         }
 
@@ -130,6 +133,8 @@ namespace Sero.Mapper
 
             foreach (var sourceObj in sourceObjList)
             {                
+                // If any of the collection elements is null, Sero.Mapper won't take any responsibility for it and
+                // throw right then and there
                 try
                 {
                     var destination = Map<TDestination>(sourceObj);
