@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Sero.Mapper
+namespace Sero.Mapper;
+
+public class MissingMappingException : Exception
 {
-    public class MissingMappingException : Exception
-    {
-        public MissingMappingException(Type srcType, Type destType) 
-            : base(string.Format("No transformation was registered for the [{0} to {1}] mapping.",
-                    srcType.GetType().ToString(),
-                    destType.GetType().ToString()))
-        {
-        }
-    }
+   public MissingMappingException(Type srcType, Type destType) :
+      base(
+         $"No transformation was registered for the [{srcType.GetType()} to {destType.GetType()}] mapping."
+      )
+   {
+
+   }
 }

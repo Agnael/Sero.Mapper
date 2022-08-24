@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Sero.Mapper
+namespace Sero.Mapper;
+
+public class DuplicatedMappingException<TSrc, TDest> : Exception
 {
-    public class DuplicatedMappingException<TSrc, TDest> : Exception
-    {
-        public DuplicatedMappingException() 
-            : base(string.Format("The [{0} to {1}] transformation was already registered.",
-                typeof(TSrc).ToString(),
-                typeof(TDest).ToString()))
-        {
-        }
-    }
+   public DuplicatedMappingException() : 
+      base($"The [{typeof(TSrc)} to {typeof(TDest)}] transformation was already registered.")
+   {
+
+   }
 }

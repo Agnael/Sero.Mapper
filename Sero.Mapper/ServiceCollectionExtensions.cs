@@ -2,29 +2,53 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace Sero.Mapper
+namespace Sero.Mapper;
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
-    {
-        /// <summary>
-        ///     Tries to register a Mapper instance as a Singleton service. 
-        ///     It does nothing if another instance is already registered.
-        /// </summary>
-        /// <param name="builderConfig">
-        ///     MapperBuilder configuration that will be used to internally build the Mapper.
-        /// </param>
-        /// <exception cref="System.ArgumentNullException"></exception>
-        public static void AddSeroMapper(this IServiceCollection services, Action<MapperBuilder> builderConfig)
-        {
-            if (builderConfig == null)
-                throw new ArgumentNullException("builderConfig");
+   /// <summary>
+   ///   Tries to register a Mapper instance as a Singleton service. 
+   ///   It does nothing if another instance is already registered.
+   /// </summary>
+   /// <param name="builderConfig">
+   ///   MapperBuilder configuration that will be used to internally build the Mapper.
+   /// </param>
+   /// <exception cref="System.ArgumentNullException"></exception>
+   public static IServiceCollection AddSeroMapper(
+      this IServiceCollection services, 
+      Action<MapperBuilder> builderConfig) 
+   {
+      if (builderConfig == null)
+         throw new ArgumentNullException("builderConfig");
 
-            MapperBuilder builder = new MapperBuilder();
-            builderConfig.Invoke(builder);
+      MapperBuilder builder = new MapperBuilder();
+      builderConfig.Invoke(builder);
 
-            services.TryAddSingleton(builder.Build());
-        }
-    }
+      services.TryAddScoped<IMapper>(
+         serviceProvider =>
+         {
+            IEnumerable<IMappingSheet> mappingSheetServices = 
+               serviceProvider.GetRequiredService<IEnumerable<IMappingSheet>>();
+
+            if (mappingSheetServices != null)
+            {
+               foreach (IMappingSheet mappingSheetService in mappingSheetServices)
+               {
+                  builder.AddSheet(mappingSheetService);
+               }
+            }
+
+            return builder.Build();
+         }
+      );
+
+      return services;
+   }
+
+   public static IServiceCollection AddSeroMapper(this IServiceCollection services)
+   {
+      MapperBuilder builder = new MapperBuilder();
+      return services.AddSeroMapper(_ => { });
+   }
 }
