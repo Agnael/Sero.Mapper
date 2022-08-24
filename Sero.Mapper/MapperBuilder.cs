@@ -37,11 +37,7 @@ public class MapperBuilder
    public MapperBuilder AddSheet<T>() where T : IMappingSheet
    {
       IMappingSheet instance = Activator.CreateInstance<T>();
-
-      // Passes itself to the IMappingSheet implementation so it performs bulk registrations
-      instance.MappingRegistration(this);
-
-      return this;
+      return AddSheet(instance);
    }
 
    /// <summary>
@@ -68,8 +64,9 @@ public class MapperBuilder
       bool isDuplicate = 
          _mappingList
          .Any(
-            existingMapping => existingMapping.SourceType == newMapping.SourceType && 
-            existingMapping.DestinationType == newMapping.DestinationType
+            existingMapping => 
+               existingMapping.SourceType == newMapping.SourceType && 
+               existingMapping.DestinationType == newMapping.DestinationType
          );
 
       if (isDuplicate)

@@ -22,15 +22,15 @@ public static class ServiceCollectionExtensions
       if (builderConfig == null)
          throw new ArgumentNullException("builderConfig");
 
-      MapperBuilder builder = new MapperBuilder();
-      builderConfig.Invoke(builder);
-
       services.TryAddScoped<IMapper>(
          serviceProvider =>
          {
+            MapperBuilder builder = new MapperBuilder();
+            builderConfig.Invoke(builder);
+
             IEnumerable<IMappingSheet> mappingSheetServices = 
                serviceProvider.GetRequiredService<IEnumerable<IMappingSheet>>();
-
+            
             if (mappingSheetServices != null)
             {
                foreach (IMappingSheet mappingSheetService in mappingSheetServices)
