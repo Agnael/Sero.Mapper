@@ -8,7 +8,7 @@ namespace Sero.Mapper.Tests
     {
         public void MappingRegistration(MapperBuilder builder)
         {
-            builder.CreateMap<SrcModel, DestModel>((src, dest) => 
+            builder.CreateMap<SrcModel, DestModel>((src, dest, mapper) => 
             {
                 dest.IdSrc = src.Id;
                 dest.NameSrc = src.Name;

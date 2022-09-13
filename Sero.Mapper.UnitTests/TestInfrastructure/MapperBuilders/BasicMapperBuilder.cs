@@ -20,7 +20,7 @@ namespace Sero.Mapper.Tests
             return this;
         }
 
-        internal BasicMapperBuilder WithMapping<TSrc, TDest>(TransformationMask<TSrc, TDest> transformation)
+        internal BasicMapperBuilder WithMapping<TSrc, TDest>(ConvertMutable<TSrc, TDest> transformation)
         {
             _mapperbuilder.CreateMap<TSrc, TDest>(transformation);
             return this;
