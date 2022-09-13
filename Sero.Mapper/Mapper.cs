@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Sero.Mapper;
 
@@ -17,46 +18,96 @@ public class Mapper : IMapper
    }
 
    /// <summary>
-   ///   Convenience method to avoid repeated code
+   ///   Convenience method to avoid repeated code.
    /// </summary>
-   private TDestination MapInternal<TDestination>(object src, object destBase)
+   private TDest MapInternal<TDest>(object src, object destBase)
    {
       Type sourceType = src.GetType();
-      Type destinationType = typeof(TDestination);
+      Type destinationType = typeof(TDest);
 
-      var mapping = MappingHandlers.FirstOrDefault(x => x.SourceType == sourceType
-                                                      && x.DestinationType == destinationType);
+      var mapping = 
+         MappingHandlers
+         .FirstOrDefault(
+            mapping => mapping.SourceType == sourceType && 
+            mapping.DestinationType == destinationType
+         );
 
       if (mapping == null)
          throw new MissingMappingException(sourceType, destinationType);
 
       // Final destination instance, with the user's transformation applied
-      TDestination destination = (TDestination)mapping.Transformation.Invoke(this, src, destBase);
+      bool isMutableConverterFound = 
+         mapping.Converter.TryPickT0(
+            out ConvertMutable convertMutable,
+            out ConvertImmutable convertImmutable
+         );
 
-      return destination;
+      if (!isMutableConverterFound)
+         throw new MutableConverterNotFoundException(sourceType, destinationType);
+
+      convertMutable.Invoke(src, destBase, this);
+
+      return (TDest)destBase;
+   }
+
+   /// <summary>
+   ///   Convenience method to avoid repeated code.
+   /// </summary>
+   private TDestination MapInternal<TDestination>(object src)
+   {
+      Type sourceType = src.GetType();
+      Type destinationType = typeof(TDestination);
+
+      var mapping =
+         MappingHandlers
+         .FirstOrDefault(
+            mapping => mapping.SourceType == sourceType &&
+            mapping.DestinationType == destinationType
+         );
+
+      if (mapping == null)
+         throw new MissingMappingException(sourceType, destinationType);
+
+      // Final destination instance, with the user's transformation applied
+      bool isImmutableConverterFound =
+         mapping.Converter.TryPickT1(
+            out ConvertImmutable convertImmutable,
+            out ConvertMutable convertMutable
+         );
+
+      if (convertMutable == null && convertImmutable == null)
+         throw new MissingMappingException(sourceType, destinationType);
+
+      if (!isImmutableConverterFound)
+      {
+         // TODO: Right now, if the user didn't provide a mutable base object to map over, we assume we MUST
+         // then need an immutable converter, which is not necessarily the case. We'd need to refactor this
+         // converter selection process avoiding double checks.
+         TDestination dest = Activator.CreateInstance<TDestination>();
+         convertMutable.Invoke(src, dest, this);
+
+         return dest;
+      }
+
+      return (TDestination)convertImmutable.Invoke(src, this);
    }
 
    public TDestination Map<TDestination>(object sourceObj)
    {
       if (sourceObj == null)
-         throw new ArgumentNullException("sourceObj");
+         throw new ArgumentNullException(nameof(sourceObj));
 
-      // Since the user is not trying to override an existing destination instance, we have to provide it.
-      // Having this instance allows to inject it into user's transformation lambda, helping to
-      // reduce boilerplate code.
-      TDestination destinationBase = Activator.CreateInstance<TDestination>();
-      TDestination destination = this.MapInternal<TDestination>(sourceObj, destinationBase);
-
+      TDestination destination = this.MapInternal<TDestination>(sourceObj);
       return destination;
    }
 
    public TDestination Map<TDestination>(object sourceObj, TDestination existingDestinationObj)
    {
       if (sourceObj == null)
-         throw new ArgumentNullException("sourceObj");
+         throw new ArgumentNullException(nameof(sourceObj));
 
       if (EqualityComparer<TDestination>.Default.Equals(existingDestinationObj, default(TDestination)))
-         throw new ArgumentNullException("existingDestinationObj");
+         throw new ArgumentNullException(nameof(existingDestinationObj));
 
       TDestination dto = this.MapInternal<TDestination>(sourceObj, existingDestinationObj);
       return dto;
@@ -65,7 +116,7 @@ public class Mapper : IMapper
    public ICollection<TDestination> MapList<TDestination>(IEnumerable<object> sourceObjList)
    {
       if (sourceObjList == null)
-         throw new ArgumentNullException("sourceObj");
+         throw new ArgumentNullException(nameof(sourceObjList));
 
       var destinationList = new List<TDestination>();
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OneOf;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -57,15 +58,15 @@ public class MapperBuilder
    ///   library takes care of that.
    /// </param>
    public MapperBuilder CreateMap<TSource, TDestination>(
-      TransformationMaskWithMapper<TSource, TDestination> funcMask)
+      ConvertMutable<TSource, TDestination> funcMask)
    {
-      MappingHandler newMapping = GetMappingHandler<TSource, TDestination>(funcMask);
+      MappingHandler newMapping = MakeMappingHandler<TSource, TDestination>(funcMask);
 
-      bool isDuplicate = 
+      bool isDuplicate =
          _mappingList
          .Any(
-            existingMapping => 
-               existingMapping.SourceType == newMapping.SourceType && 
+            existingMapping =>
+               existingMapping.SourceType == newMapping.SourceType &&
                existingMapping.DestinationType == newMapping.DestinationType
          );
 
@@ -93,9 +94,9 @@ public class MapperBuilder
    ///   you need. It must not return the resulting transformed "dest" parameter, the library takes care 
    ///   of that.
    /// </param>
-   public MapperBuilder CreateMap<TSource, TDestination>(TransformationMask<TSource, TDestination> funcMask)
+   public MapperBuilder CreateMap<TSource, TDestination>(ConvertImmutable<TSource, TDestination> funcMask)
    {
-      MappingHandler newMapping = GetMappingHandler<TSource, TDestination>(funcMask);
+      MappingHandler newMapping = MakeMappingHandler<TSource, TDestination>(funcMask);
 
       bool isDuplicate =
          _mappingList
@@ -118,41 +119,31 @@ public class MapperBuilder
    /// <summary>
    ///   Builds and returns a MappingHandler instance. Convenience method to avoid repeating code.
    /// </summary>
-   private MappingHandler GetMappingHandler<TSource, TDestination>(
-      TransformationMask<TSource, TDestination> funcMask)
+   private MappingHandler MakeMappingHandler<TSrc, TDest>(
+      OneOf<ConvertMutable<TSrc, TDest>, ConvertImmutable<TSrc, TDest>> converter)
    {
-      MappingHandler mapping = 
-         new MappingHandler(
-            typeof(TSource),
-            typeof(TDestination),
-            (mapper, obj, destObj) =>
+      MappingHandler mappingHandler =
+         converter
+         .Match(
+            convertMutable =>
             {
-               funcMask.Invoke((TSource)obj, (TDestination)destObj);
-               return destObj;
+               return new MappingHandler(
+                  typeof(TSrc),
+                  typeof(TDest),
+                  (src, dest, mapper) => convertMutable.Invoke((TSrc)src, (TDest)dest, mapper)
+               );
+            },
+            convertImmutable =>
+            {
+               return new MappingHandler(
+                  typeof(TSrc),
+                  typeof(TDest),
+                  (src, mapper) => convertImmutable.Invoke((TSrc)src, mapper)
+               );
             }
          );
 
-      return mapping;
-   }
-
-   /// <summary>
-   ///   Builds and returns a MappingHandler instance. Convenience method to avoid repeating code.
-   /// </summary>
-   private MappingHandler GetMappingHandler<TSource, TDestination>(
-      TransformationMaskWithMapper<TSource, TDestination> funcMask)
-   {
-      MappingHandler mapping =
-         new MappingHandler(
-             typeof(TSource),
-             typeof(TDestination),
-             (mapper, obj, destObj) =>
-             {
-                funcMask.Invoke((TSource)obj, (TDestination)destObj, mapper);
-                return destObj;
-             }
-         );
-
-      return mapping;
+      return mappingHandler;
    }
 
    /// <summary>
