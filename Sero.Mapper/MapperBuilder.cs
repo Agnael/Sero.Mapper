@@ -10,11 +10,11 @@ namespace Sero.Mapper;
 /// </summary>
 public class MapperBuilder
 {
-   private List<MappingHandler> _mappingList;
+   private IMappingCollection<MappingHandler> _mappingCollection;
 
    public MapperBuilder()
    {
-      _mappingList = new List<MappingHandler>();
+      _mappingCollection = new MappingCollection<MappingHandler>();
    }
 
    /// <summary>
@@ -32,12 +32,12 @@ public class MapperBuilder
    /// <summary>
    ///     Convenience method that only needs the IMappingSheet implementation class name to register it's definitions.
    /// </summary>
-   /// <typeparam name="T">
+   /// <typeparam name="TSheet">
    ///     A class that implements IMappingSheet.
    /// </typeparam>
-   public MapperBuilder AddSheet<T>() where T : IMappingSheet
+   public MapperBuilder AddSheet<TSheet>() where TSheet : IMappingSheet
    {
-      IMappingSheet instance = Activator.CreateInstance<T>();
+      IMappingSheet instance = Activator.CreateInstance<TSheet>();
       return AddSheet(instance);
    }
 
@@ -46,10 +46,10 @@ public class MapperBuilder
    ///   This method overload allows you to register a transformation lambda that receives the current 
    ///   Mapper instance, to execute mappings in the lambda.
    /// </summary>
-   /// <typeparam name="TSource">
+   /// <typeparam name="TSrc">
    ///   Source type that the transformation should receive.
    /// </typeparam>
-   /// <typeparam name="TDestination">
+   /// <typeparam name="TDest">
    ///   Destination type that the transformation must return.
    /// </typeparam>
    /// <param name="funcMask">
@@ -57,36 +57,28 @@ public class MapperBuilder
    ///   transformation you need. It must not return the resulting transformed "dest" parameter, the 
    ///   library takes care of that.
    /// </param>
-   public MapperBuilder CreateMap<TSource, TDestination>(
-      ConvertMutable<TSource, TDestination> funcMask)
+   public MapperBuilder CreateMap<TSrc, TDest>(ConvertMutable<TSrc, TDest> funcMask)
    {
-      MappingHandler newMapping = MakeMappingHandler<TSource, TDestination>(funcMask);
+      MappingHandler newMapping = MappingHandler.Make<TSrc, TDest>(funcMask);
+      _mappingCollection.Add(newMapping);
+      return this;
+   }
 
-      bool isDuplicate =
-         _mappingList
-         .Any(
-            existingMapping =>
-               existingMapping.SourceType == newMapping.SourceType &&
-               existingMapping.DestinationType == newMapping.DestinationType
-         );
-
-      if (isDuplicate)
-      {
-         throw new DuplicatedMappingException<TSource, TDestination>();
-      }
-
-      _mappingList.Add(newMapping);
-
+   public MapperBuilder CreateAsyncMap<TSource, TDestination>(
+      ConvertMutableAsync<TSource, TDestination> funcMask)
+   {
+      MappingHandler newAsyncMapping = MappingHandler.Make<TSource, TDestination>(funcMask);
+      _mappingCollection.Add(newAsyncMapping);
       return this;
    }
 
    /// <summary>
    ///   Creates a single mapping definition for the SOURCE-DESTINATION types provided.
    /// </summary>
-   /// <typeparam name="TSource">
+   /// <typeparam name="TSrc">
    ///   Source type that the transformation should receive.
    /// </typeparam>
-   /// <typeparam name="TDestination">
+   /// <typeparam name="TDest">
    ///   Destination type that the transformation must return.
    /// </typeparam>
    /// <param name="funcMask">
@@ -94,56 +86,18 @@ public class MapperBuilder
    ///   you need. It must not return the resulting transformed "dest" parameter, the library takes care 
    ///   of that.
    /// </param>
-   public MapperBuilder CreateMap<TSource, TDestination>(ConvertImmutable<TSource, TDestination> funcMask)
+   public MapperBuilder CreateMap<TSrc, TDest>(ConvertImmutable<TSrc, TDest> funcMask)
    {
-      MappingHandler newMapping = MakeMappingHandler<TSource, TDestination>(funcMask);
-
-      bool isDuplicate =
-         _mappingList
-         .Any(
-            existingMapping =>
-               existingMapping.SourceType == newMapping.SourceType &&
-               existingMapping.DestinationType == newMapping.DestinationType
-         );
-
-      if (isDuplicate)
-      {
-         throw new DuplicatedMappingException<TSource, TDestination>();
-      }
-
-      _mappingList.Add(newMapping);
-
+      MappingHandler newMapping = MappingHandler.Make<TSrc, TDest>(funcMask);
+      _mappingCollection.Add(newMapping);
       return this;
    }
 
-   /// <summary>
-   ///   Builds and returns a MappingHandler instance. Convenience method to avoid repeating code.
-   /// </summary>
-   private MappingHandler MakeMappingHandler<TSrc, TDest>(
-      OneOf<ConvertMutable<TSrc, TDest>, ConvertImmutable<TSrc, TDest>> converter)
+   public MapperBuilder CreateAsyncMap<TSrc, TDest>(ConvertImmutableAsync<TSrc, TDest> funcMask)
    {
-      MappingHandler mappingHandler =
-         converter
-         .Match(
-            convertMutable =>
-            {
-               return new MappingHandler(
-                  typeof(TSrc),
-                  typeof(TDest),
-                  (src, dest, mapper) => convertMutable.Invoke((TSrc)src, (TDest)dest, mapper)
-               );
-            },
-            convertImmutable =>
-            {
-               return new MappingHandler(
-                  typeof(TSrc),
-                  typeof(TDest),
-                  (src, mapper) => convertImmutable.Invoke((TSrc)src, mapper)
-               );
-            }
-         );
-
-      return mappingHandler;
+      MappingHandler newAsyncMapping = MappingHandler.Make<TSrc, TDest>(funcMask);
+      _mappingCollection.Add(newAsyncMapping);
+      return this;
    }
 
    /// <summary>
@@ -151,6 +105,6 @@ public class MapperBuilder
    /// </summary>
    public Mapper Build()
    {
-      return new Mapper(_mappingList);
+      return new Mapper(_mappingCollection);
    }
 }

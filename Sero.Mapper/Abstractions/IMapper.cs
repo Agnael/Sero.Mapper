@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Sero.Mapper;
 
@@ -23,6 +24,7 @@ public interface IMapper
    ///     Thrown when trying to map a SOURCE-DESTINATION pair that has no transformation registered.
    /// </exception>
    TDestination Map<TDestination>(object sourceObj);
+   Task<TDestination> MapAsync<TDestination>(object sourceObj);
 
    /// <summary>
    ///     Executes a transformation from a source instance into a an existing destination instance, 
@@ -47,6 +49,7 @@ public interface IMapper
    ///     The provided destination instance with the transformation applied.
    /// </returns>
    TDestination Map<TDestination>(object sourceObj, TDestination existingDestinationObj);
+   Task<TDestination> MapAsync<TDestination>(object sourceObj, TDestination existingDestinationObj);
 
    /// <summary>
    ///     Returns an ICollection with one destination type instance per element in the received source instance IEnumerable.
@@ -70,4 +73,5 @@ public interface IMapper
    ///     Thrown when trying to map a SOURCE-DESTINATION pair that has no transformation registered.
    /// </exception>
    ICollection<TDestination> MapList<TDestination>(IEnumerable<object> sourceObjList);
+   Task<ICollection<TDestination>> MapListAsync<TDestination>(IEnumerable<object> sourceObjList);
 }

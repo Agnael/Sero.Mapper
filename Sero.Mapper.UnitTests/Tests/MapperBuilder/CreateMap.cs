@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Xunit;
+﻿using Xunit;
 
 namespace Sero.Mapper.Tests.MapperBuilderTests
 {
@@ -13,7 +10,7 @@ namespace Sero.Mapper.Tests.MapperBuilderTests
             MapperBuilder builder = new MapperBuilder();
             builder.CreateMap<SrcModel, DestModel>((src, dest, mapper) => { });
 
-            Assert.Throws<DuplicatedMappingException<SrcModel, DestModel>>(
+            Assert.Throws<MappingCollectionDuplicateException>(
                 () => builder.CreateMap<SrcModel, DestModel>((src, dest, mapper) => { })
             );
         }
@@ -24,7 +21,7 @@ namespace Sero.Mapper.Tests.MapperBuilderTests
             MapperBuilder builder = new MapperBuilder();
             builder.CreateMap<SrcModel, DestModel>((src, dest, mapper) => { });
 
-            Assert.Throws<DuplicatedMappingException<SrcModel, DestModel>>(
+            Assert.Throws<MappingCollectionDuplicateException>(
                 () => builder.CreateMap<SrcModel, DestModel>((src, dest, mapper) => { })
             );
         }
