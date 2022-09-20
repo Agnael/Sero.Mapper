@@ -64,8 +64,7 @@ public class MapperBuilder
       return this;
    }
 
-   public MapperBuilder CreateAsyncMap<TSource, TDestination>(
-      ConvertMutableAsync<TSource, TDestination> funcMask)
+   public MapperBuilder CreateMap<TSource, TDestination>(ConvertMutableAsync<TSource, TDestination> funcMask)
    {
       MappingHandler newAsyncMapping = MappingHandler.Make<TSource, TDestination>(funcMask);
       _mappingCollection.Add(newAsyncMapping);
@@ -93,7 +92,7 @@ public class MapperBuilder
       return this;
    }
 
-   public MapperBuilder CreateAsyncMap<TSrc, TDest>(ConvertImmutableAsync<TSrc, TDest> funcMask)
+   public MapperBuilder CreateMap<TSrc, TDest>(ConvertImmutableAsync<TSrc, TDest> funcMask)
    {
       MappingHandler newAsyncMapping = MappingHandler.Make<TSrc, TDest>(funcMask);
       _mappingCollection.Add(newAsyncMapping);
