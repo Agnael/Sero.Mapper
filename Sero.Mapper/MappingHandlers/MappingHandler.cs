@@ -36,6 +36,11 @@ public record MappingHandler(
    OneOf<ConvertMutable, ConvertImmutable, ConvertMutableAsync, ConvertImmutableAsync> Converter
 ) : IMapping
 {
+   public override string ToString()
+   {
+      return $"[{SourceType} to {DestinationType} {nameof(MappingHandler)}]";
+   }
+
    public static MappingHandler Make<TSrc, TDest>(
       OneOf<
          ConvertMutable<TSrc, TDest>, 

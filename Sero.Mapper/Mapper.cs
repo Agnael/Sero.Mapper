@@ -1,4 +1,5 @@
 ﻿using Functional.Maybe;
+using Microsoft.Extensions.Logging;
 using Nito.AsyncEx.Synchronous;
 using System;
 using System.Collections.Generic;
@@ -12,11 +13,13 @@ namespace Sero.Mapper;
 /// </summary>
 public class Mapper : IMapper
 {
-   public readonly IMappingCollection<MappingHandler> MappingHandlers;
+   private readonly ILogger _logger;
+   private readonly IMappingCollection<MappingHandler> _mappingHandlers;
 
-   public Mapper(IMappingCollection<MappingHandler> mappingHandlers)
+   public Mapper(ILogger logger, IMappingCollection<MappingHandler> mappingHandlers)
    {
-      this.MappingHandlers = mappingHandlers;
+      _logger = logger;
+      _mappingHandlers = mappingHandlers;
    }
 
    private void CheckNotNull(string argName, object argValue)
@@ -114,6 +117,13 @@ public class Mapper : IMapper
       return (TDest)mapped;
    }
 
+   private string GetMessage_AsyncMappingExecutedSynchronously(MappingHandler mapping)
+   {
+      return
+         $"The {mapping} was defined as ASYNC when created, but then executed with the thread " +
+         $"blocking {nameof(Map)} method which . You should use {nameof(MapAsync)} instead.";
+   }
+
    public TDestination Map<TDestination>(object sourceObj)
    {
       CheckNotNull(nameof(sourceObj), sourceObj);
@@ -121,13 +131,23 @@ public class Mapper : IMapper
       Type sourceType = sourceObj.GetType();
       Type destinationType = typeof(TDestination);
 
-      MappingHandler mapping = MappingHandlers.GetMappingHandler(sourceType, destinationType);
+      MappingHandler mapping = _mappingHandlers.GetMappingHandler(sourceType, destinationType);
 
       return mapping.Converter.Match(
          convertMutable          => MapInternal<TDestination>(convertMutable, sourceObj),
          convertImmutable        => MapInternal<TDestination>(convertImmutable, sourceObj),
-         convertMutableAsync     => MapInternal<TDestination>(convertMutableAsync, sourceObj),
-         convertImmutableAsync   => MapInternal<TDestination>(convertImmutableAsync, sourceObj)
+         convertMutableAsync     =>
+         {
+            _logger.LogWarning(GetMessage_AsyncMappingExecutedSynchronously(mapping));
+
+            return MapInternal<TDestination>(convertMutableAsync, sourceObj);
+         },
+         convertImmutableAsync   => 
+         {
+            _logger.LogWarning(GetMessage_AsyncMappingExecutedSynchronously(mapping));
+
+            return MapInternal<TDestination>(convertImmutableAsync, sourceObj);
+         }
       );
    }
 
@@ -139,7 +159,7 @@ public class Mapper : IMapper
       Type srcType = sourceObj.GetType();
       Type destType = typeof(TDestination);
 
-      MappingHandler mapping = MappingHandlers.GetMappingHandler(srcType, destType);
+      MappingHandler mapping = _mappingHandlers.GetMappingHandler(srcType, destType);
 
       return mapping.Converter.Match(
          convertMutable          => MapInternal(convertMutable, sourceObj, existingDestinationObj),
@@ -156,7 +176,7 @@ public class Mapper : IMapper
       Type sourceType = sourceObj.GetType();
       Type destinationType = typeof(TDest);
 
-      MappingHandler mapping = MappingHandlers.GetMappingHandler(sourceType, destinationType);
+      MappingHandler mapping = _mappingHandlers.GetMappingHandler(sourceType, destinationType);
 
       return await mapping.Converter.Match(
          async convertMutable          => MapInternal<TDest>(convertMutable, sourceObj),
@@ -176,7 +196,7 @@ public class Mapper : IMapper
       Type srcType = sourceObj.GetType();
       Type destType = typeof(TDest);
 
-      MappingHandler mapping = MappingHandlers.GetMappingHandler(srcType, destType);
+      MappingHandler mapping = _mappingHandlers.GetMappingHandler(srcType, destType);
 
       return await mapping.Converter.Match(
          async convertMutable => 

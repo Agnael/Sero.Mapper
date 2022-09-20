@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Extensions.Logging.Abstractions;
 using Sero.Mapper;
 
 namespace Sero.Mapper.Tests
@@ -11,7 +12,7 @@ namespace Sero.Mapper.Tests
 
         public BasicMapperBuilder()
         {
-            _mapperbuilder = new MapperBuilder();
+            _mapperbuilder = new MapperBuilder(new NullLogger<Mapper>());
         }
 
         internal BasicMapperBuilder WithDefaultMapping()

@@ -1,4 +1,5 @@
-﻿using OneOf;
+﻿using Microsoft.Extensions.Logging;
+using OneOf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +11,12 @@ namespace Sero.Mapper;
 /// </summary>
 public class MapperBuilder
 {
+   private readonly ILogger _logger;
    private IMappingCollection<MappingHandler> _mappingCollection;
 
-   public MapperBuilder()
+   public MapperBuilder(ILogger logger)
    {
+      _logger = logger;
       _mappingCollection = new MappingCollection<MappingHandler>();
    }
 
@@ -104,6 +107,6 @@ public class MapperBuilder
    /// </summary>
    public Mapper Build()
    {
-      return new Mapper(_mappingCollection);
+      return new Mapper(_logger, _mappingCollection);
    }
 }

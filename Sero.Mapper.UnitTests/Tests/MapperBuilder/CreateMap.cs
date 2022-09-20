@@ -1,4 +1,6 @@
-﻿using Xunit;
+﻿using Castle.Core.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Xunit;
 
 namespace Sero.Mapper.Tests.MapperBuilderTests
 {
@@ -7,7 +9,7 @@ namespace Sero.Mapper.Tests.MapperBuilderTests
         [Fact]
         public void SimpleTransformation__CreatesDuplicateMapping__DuplicatedMappingException()
         {
-            MapperBuilder builder = new MapperBuilder();
+            MapperBuilder builder = new MapperBuilder(new NullLogger<Mapper>());
             builder.CreateMap<SrcModel, DestModel>((src, dest, mapper) => { });
 
             Assert.Throws<MappingCollectionDuplicateException>(
@@ -18,7 +20,7 @@ namespace Sero.Mapper.Tests.MapperBuilderTests
         [Fact]
         public void TransformationWithMapper__CreatesDuplicateMapping__DuplicatedMappingException()
         {
-            MapperBuilder builder = new MapperBuilder();
+            MapperBuilder builder = new MapperBuilder(new NullLogger<Mapper>());
             builder.CreateMap<SrcModel, DestModel>((src, dest, mapper) => { });
 
             Assert.Throws<MappingCollectionDuplicateException>(

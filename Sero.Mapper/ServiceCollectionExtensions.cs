@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Collections.Generic;
 
@@ -25,7 +27,10 @@ public static class ServiceCollectionExtensions
       services.TryAddScoped<IMapper>(
          serviceProvider =>
          {
-            MapperBuilder builder = new MapperBuilder();
+            ILogger logger = 
+               serviceProvider.GetService<ILogger<Mapper>>() ?? new NullLogger<Mapper>();
+
+            MapperBuilder builder = new MapperBuilder(logger);
             builderConfig.Invoke(builder);
 
             IEnumerable<IMappingSheet> mappingSheetServices = 
@@ -48,7 +53,6 @@ public static class ServiceCollectionExtensions
 
    public static IServiceCollection AddSeroMapper(this IServiceCollection services)
    {
-      MapperBuilder builder = new MapperBuilder();
       return services.AddSeroMapper(_ => { });
    }
 }
