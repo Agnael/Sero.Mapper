@@ -44,7 +44,7 @@ namespace Sero.Mapper.Tests.MapperTests
 
             Mapper sut = _sutBuilder
                             .WithDefaultMapping()
-                            .WithMapping<SrcNameModel, DestModel>((source, dest, mapper) => 
+                            .WithMapping<SrcNameModel, DestModel>((source, dest, mapper, sp) => 
                             {
                                 dest.NameSrc = source.Name;
                             })

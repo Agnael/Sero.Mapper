@@ -1,35 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
-using Sero.Mapper;
 
-namespace Sero.Mapper.Tests
+namespace Sero.Mapper.Tests;
+
+internal class BasicMapperBuilder
 {
-    internal class BasicMapperBuilder
-    {
-        private MapperBuilder _mapperbuilder;
+   private MapperBuilder _mapperbuilder;
 
-        public BasicMapperBuilder()
-        {
-            _mapperbuilder = new MapperBuilder(new NullLogger<Mapper>());
-        }
+   public BasicMapperBuilder()
+   {
+      IServiceProvider sp = new ServiceCollection().BuildServiceProvider();
+      _mapperbuilder = new MapperBuilder(new NullLogger<Mapper>(), sp);
+   }
 
-        internal BasicMapperBuilder WithDefaultMapping()
-        {
-            _mapperbuilder.AddSheet<DefaultSheet>();
-            return this;
-        }
+   internal BasicMapperBuilder WithDefaultMapping()
+   {
+      _mapperbuilder.AddSheet<DefaultSheet>();
+      return this;
+   }
 
-        internal BasicMapperBuilder WithMapping<TSrc, TDest>(ConvertMutable<TSrc, TDest> transformation)
-        {
-            _mapperbuilder.CreateMap<TSrc, TDest>(transformation);
-            return this;
-        }
+   internal BasicMapperBuilder WithMapping<TSrc, TDest>(ConvertMutable<TSrc, TDest> transformation)
+   {
+      _mapperbuilder.CreateMap<TSrc, TDest>(transformation);
+      return this;
+   }
 
-        internal Mapper Build()
-        {
-            return _mapperbuilder.Build();
-        }
-    }
+   internal Mapper Build()
+   {
+      return _mapperbuilder.Build();
+   }
 }
