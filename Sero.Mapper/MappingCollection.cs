@@ -4,12 +4,11 @@ using System.Linq;
 
 namespace Sero.Mapper;
 
-public class MappingCollection<TMapping> : SynchronizedCollection<TMapping>, IMappingCollection<TMapping>
-   where TMapping : class, IMapping
+public class MappingCollection : SynchronizedCollection<MappingHandler>, IMappingCollection
 {
-   public TMapping GetMappingHandler(Type srcType, Type destType)
+   public MappingHandler GetMappingHandler(Type srcType, Type destType)
    {
-      TMapping handler =
+      MappingHandler handler =
          this.FirstOrDefault(
             mapping => mapping.SourceType == srcType &&
             mapping.DestinationType == destType
@@ -21,7 +20,7 @@ public class MappingCollection<TMapping> : SynchronizedCollection<TMapping>, IMa
       return handler;
    }
 
-   public new void Add(TMapping mapping)
+   public new void Add(MappingHandler mapping)
    {
       bool isDuplicate =
          this.Any(
@@ -33,6 +32,6 @@ public class MappingCollection<TMapping> : SynchronizedCollection<TMapping>, IMa
       if (isDuplicate)
          throw new MappingCollectionDuplicateException(mapping.SourceType, mapping.DestinationType);
 
-      (this as SynchronizedCollection<TMapping>).Add(mapping);
+      (this as SynchronizedCollection<MappingHandler>).Add(mapping);
    }
 }

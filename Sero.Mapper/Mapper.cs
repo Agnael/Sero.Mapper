@@ -1,4 +1,5 @@
 ﻿using Functional.Maybe;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Nito.AsyncEx.Synchronous;
 using System;
@@ -14,11 +15,16 @@ namespace Sero.Mapper;
 public class Mapper : IMapper
 {
    private readonly ILogger _logger;
-   private readonly IMappingCollection<MappingHandler> _mappingHandlers;
+   private readonly IServiceProvider _serviceProvider;
+   private readonly IMappingCollection _mappingHandlers;
 
-   public Mapper(ILogger logger, IMappingCollection<MappingHandler> mappingHandlers)
+   public Mapper(
+      ILogger logger, 
+      IServiceProvider serviceProvider, 
+      IMappingCollection mappingHandlers)
    {
       _logger = logger;
+      _serviceProvider = serviceProvider;
       _mappingHandlers = mappingHandlers;
    }
 
@@ -42,13 +48,13 @@ public class Mapper : IMapper
 
    private TDest MapInternal<TDest>(ConvertMutable convertMutable, object srcObj, TDest preexistingDest)
    {
-      convertMutable.Invoke(srcObj, preexistingDest, this);
+      convertMutable.Invoke(srcObj, preexistingDest, this, _serviceProvider);
       return preexistingDest;
    }
 
    private TDest MapInternal<TDest>(ConvertImmutable convertImmutable, object srcObj)
    {
-      return (TDest)convertImmutable.Invoke(srcObj, this);
+      return (TDest)convertImmutable.Invoke(srcObj, this, _serviceProvider);
    }
 
    private TDest MapInternal<TDest>(ConvertMutableAsync convertMutableAsync, object srcObj)
@@ -69,7 +75,7 @@ public class Mapper : IMapper
          Task.Run(
             async () =>
             {
-               await convertMutableAsync.Invoke(srcObj, preexistingDest, this);
+               await convertMutableAsync.Invoke(srcObj, preexistingDest, this, _serviceProvider);
                return preexistingDest;
             }
          );
@@ -86,7 +92,7 @@ public class Mapper : IMapper
          Task.Run(
             async () =>
             {
-               object mapped = await convertImmutableAsync.Invoke(srcObj, this);
+               object mapped = await convertImmutableAsync.Invoke(srcObj, this, _serviceProvider);
                return (TDest)mapped;
             }
          );
@@ -105,7 +111,7 @@ public class Mapper : IMapper
       object srcObj,
       TDest existingDestObj)
    {
-      await convertMutableAsync.Invoke(srcObj, existingDestObj, this);
+      await convertMutableAsync.Invoke(srcObj, existingDestObj, this, _serviceProvider);
       return existingDestObj;
    }
 
@@ -113,7 +119,7 @@ public class Mapper : IMapper
       ConvertImmutableAsync convertImmutableAsync, 
       object srcObj)
    {
-      object mapped = await convertImmutableAsync.Invoke(srcObj, this);
+      object mapped = await convertImmutableAsync.Invoke(srcObj, this, _serviceProvider);
       return (TDest)mapped;
    }
 
@@ -139,13 +145,11 @@ public class Mapper : IMapper
          convertMutableAsync     =>
          {
             _logger.LogWarning(GetMessage_AsyncMappingExecutedSynchronously(mapping));
-
             return MapInternal<TDestination>(convertMutableAsync, sourceObj);
          },
          convertImmutableAsync   => 
          {
             _logger.LogWarning(GetMessage_AsyncMappingExecutedSynchronously(mapping));
-
             return MapInternal<TDestination>(convertImmutableAsync, sourceObj);
          }
       );

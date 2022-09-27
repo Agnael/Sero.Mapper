@@ -30,12 +30,12 @@ public static class ServiceCollectionExtensions
             ILogger logger = 
                serviceProvider.GetService<ILogger<Mapper>>() ?? new NullLogger<Mapper>();
 
-            MapperBuilder builder = new MapperBuilder(logger);
+            MapperBuilder builder = new MapperBuilder(logger, serviceProvider);
             builderConfig.Invoke(builder);
 
             IEnumerable<IMappingSheet> mappingSheetServices = 
                serviceProvider.GetRequiredService<IEnumerable<IMappingSheet>>();
-            
+                        
             if (mappingSheetServices != null)
             {
                foreach (IMappingSheet mappingSheetService in mappingSheetServices)

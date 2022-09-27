@@ -4,8 +4,7 @@ using System.Collections.Generic;
 
 namespace Sero.Mapper;
 
-public interface IMappingCollection<TMapping> : ICollection<TMapping>
-   where TMapping : class, IMapping
+public interface IMappingCollection : ICollection<MappingHandler>
 {
-   TMapping GetMappingHandler(Type srcType, Type destType);
+   MappingHandler GetMappingHandler(Type srcType, Type destType);
 }

@@ -12,12 +12,14 @@ namespace Sero.Mapper;
 public class MapperBuilder
 {
    private readonly ILogger _logger;
-   private IMappingCollection<MappingHandler> _mappingCollection;
+   private readonly IServiceProvider _serviceProvider;
+   private IMappingCollection _mappingCollection;
 
-   public MapperBuilder(ILogger logger)
+   public MapperBuilder(ILogger logger, IServiceProvider serviceProvider)
    {
       _logger = logger;
-      _mappingCollection = new MappingCollection<MappingHandler>();
+      _serviceProvider = serviceProvider;
+      _mappingCollection = new MappingCollection();
    }
 
    /// <summary>
@@ -107,6 +109,6 @@ public class MapperBuilder
    /// </summary>
    public Mapper Build()
    {
-      return new Mapper(_logger, _mappingCollection);
+      return new Mapper(_logger, _serviceProvider, _mappingCollection);
    }
 }
