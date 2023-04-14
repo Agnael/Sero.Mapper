@@ -23,8 +23,11 @@ public interface IMapper
    /// <exception cref="Sero.Mapper.MissingMappingException">
    ///     Thrown when trying to map a SOURCE-DESTINATION pair that has no transformation registered.
    /// </exception>
-   TDestination Map<TDestination>(object sourceObj);
-   Task<TDestination> MapAsync<TDestination>(object sourceObj);
+   TDestination Map<TDestination>(object sourceObj)
+       where TDestination : class;
+
+   Task<TDestination> MapAsync<TDestination>(object sourceObj)
+       where TDestination : class;
 
    /// <summary>
    ///     Executes a transformation from a source instance into a an existing destination instance, 
@@ -48,8 +51,11 @@ public interface IMapper
    /// <returns>
    ///     The provided destination instance with the transformation applied.
    /// </returns>
-   TDestination Map<TDestination>(object sourceObj, TDestination existingDestinationObj);
-   Task<TDestination> MapAsync<TDestination>(object sourceObj, TDestination existingDestinationObj);
+   TDestination Map<TDestination>(object sourceObj, TDestination existingDestinationObj)
+       where TDestination : class;
+
+   Task<TDestination> MapAsync<TDestination>(object sourceObj, TDestination existingDestinationObj)
+       where TDestination : class;
 
    /// <summary>
    ///     Returns an ICollection with one destination type instance per element in the received source instance IEnumerable.
@@ -72,6 +78,9 @@ public interface IMapper
    /// <exception cref="Sero.Mapper.MissingMappingException">
    ///     Thrown when trying to map a SOURCE-DESTINATION pair that has no transformation registered.
    /// </exception>
-   ICollection<TDestination> MapList<TDestination>(IEnumerable<object> sourceObjList);
-   Task<ICollection<TDestination>> MapListAsync<TDestination>(IEnumerable<object> sourceObjList);
+   ICollection<TDestination> MapList<TDestination>(IEnumerable<object> sourceObjList)
+       where TDestination : class;
+
+   Task<ICollection<TDestination>> MapListAsync<TDestination>(IEnumerable<object> sourceObjList)
+       where TDestination : class;
 }

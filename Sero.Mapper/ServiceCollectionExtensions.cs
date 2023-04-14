@@ -35,7 +35,7 @@ public static class ServiceCollectionExtensions
 
             IEnumerable<IMappingSheet> mappingSheetServices = 
                serviceProvider.GetRequiredService<IEnumerable<IMappingSheet>>();
-                        
+
             if (mappingSheetServices != null)
             {
                foreach (IMappingSheet mappingSheetService in mappingSheetServices)

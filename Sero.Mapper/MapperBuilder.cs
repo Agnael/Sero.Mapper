@@ -104,6 +104,20 @@ public class MapperBuilder
       return this;
    }
 
+   public MapperBuilder CreateMap<TSrc, TDest>(ConvertImmutableWithBase<TSrc, TDest> funcMask)
+   {
+      MappingHandler newMapping = MappingHandler.Make<TSrc, TDest>(funcMask);
+      _mappingCollection.Add(newMapping);
+      return this;
+   }
+
+   public MapperBuilder CreateMap<TSrc, TDest>(ConvertImmutableWithBaseAsync<TSrc, TDest> funcMask)
+   {
+      MappingHandler newAsyncMapping = MappingHandler.Make<TSrc, TDest>(funcMask);
+      _mappingCollection.Add(newAsyncMapping);
+      return this;
+   }
+
    /// <summary>
    ///   Uses the MapperBuilder configurations to build a Mapper instance.
    /// </summary>

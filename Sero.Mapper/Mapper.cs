@@ -1,6 +1,4 @@
-﻿using Functional.Maybe;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Nito.AsyncEx.Synchronous;
 using System;
 using System.Collections.Generic;
@@ -28,18 +26,6 @@ public class Mapper : IMapper
       _mappingHandlers = mappingHandlers;
    }
 
-   private void CheckNotNull(string argName, object argValue)
-   {
-      if (argValue == null)
-         throw new ArgumentNullException(argName);
-   }
-
-   private void CheckNotNull<TValue>(string argName, TValue argValue)
-   {
-      if (EqualityComparer<TValue>.Default.Equals(argValue, default(TValue)))
-         throw new ArgumentNullException(argName);
-   }
-
    private TDest MapInternal<TDest>(ConvertMutable convertMutable, object srcObj)
    {
       TDest destObj = Activator.CreateInstance<TDest>();
@@ -50,6 +36,32 @@ public class Mapper : IMapper
    {
       convertMutable.Invoke(srcObj, preexistingDest, this, _serviceProvider);
       return preexistingDest;
+   }
+
+   private TDest MapInternal<TDest>(
+      ConvertImmutableWithBase convertImmutableWithBase, 
+      object srcObj, 
+      TDest preexistingDest)
+   {
+      convertImmutableWithBase.Invoke(srcObj, this, _serviceProvider, preexistingDest);
+      return preexistingDest;
+   }
+
+   private TDest MapInternal<TDest>(
+      ConvertImmutableWithBaseAsync convertImmutableWithBaseAsync,
+      object srcObj,
+      TDest preexistingDest)
+   {
+      Task<TDest> mappingTask =
+         Task.Run(
+            async () =>
+            {
+               await convertImmutableWithBaseAsync.Invoke(srcObj, this, _serviceProvider, preexistingDest);
+               return preexistingDest;
+            }
+         );
+
+      return mappingTask.WaitAndUnwrapException();
    }
 
    private TDest MapInternal<TDest>(ConvertImmutable convertImmutable, object srcObj)
@@ -123,6 +135,17 @@ public class Mapper : IMapper
       return (TDest)mapped;
    }
 
+   private async Task<TDest> MapInternalAsync<TDest>(
+      ConvertImmutableWithBaseAsync convertImmutableWithBaseAsync,
+      object srcObj,
+      TDest existingDestObj)
+   {
+      object outputObj =
+         await convertImmutableWithBaseAsync.Invoke(srcObj, this, _serviceProvider, existingDestObj);
+
+      return (TDest)outputObj;
+   }
+
    private string GetMessage_AsyncMappingExecutedSynchronously(MappingHandler mapping)
    {
       return
@@ -130,9 +153,11 @@ public class Mapper : IMapper
          $"blocking {nameof(Map)} method which . You should use {nameof(MapAsync)} instead.";
    }
 
-   public TDestination Map<TDestination>(object sourceObj)
+   public TDestination Map<TDestination>(object sourceObj) 
+      where TDestination : class
    {
-      CheckNotNull(nameof(sourceObj), sourceObj);
+      if (sourceObj == null)
+         return (TDestination)null;
 
       Type sourceType = sourceObj.GetType();
       Type destinationType = typeof(TDestination);
@@ -140,25 +165,40 @@ public class Mapper : IMapper
       MappingHandler mapping = _mappingHandlers.GetMappingHandler(sourceType, destinationType);
 
       return mapping.Converter.Match(
-         convertMutable          => MapInternal<TDestination>(convertMutable, sourceObj),
-         convertImmutable        => MapInternal<TDestination>(convertImmutable, sourceObj),
-         convertMutableAsync     =>
+         convertMutable => 
+            MapInternal<TDestination>(convertMutable, sourceObj),
+
+         convertImmutable => 
+            MapInternal<TDestination>(convertImmutable, sourceObj),
+
+         convertMutableAsync =>
          {
             _logger.LogWarning(GetMessage_AsyncMappingExecutedSynchronously(mapping));
             return MapInternal<TDestination>(convertMutableAsync, sourceObj);
          },
-         convertImmutableAsync   => 
+
+         convertImmutableAsync => 
          {
             _logger.LogWarning(GetMessage_AsyncMappingExecutedSynchronously(mapping));
             return MapInternal<TDestination>(convertImmutableAsync, sourceObj);
-         }
+         },
+
+         convertImmutableWithBase =>
+            throw new InvalidImmutableMappingOperationException(sourceType, destinationType),
+
+         convertImmutableWithBaseAsync =>
+            throw new InvalidImmutableMappingOperationException(sourceType, destinationType)
       );
    }
 
    public TDestination Map<TDestination>(object sourceObj, TDestination existingDestinationObj)
+      where TDestination : class
    {
-      CheckNotNull(nameof(sourceObj), sourceObj);
-      CheckNotNull(nameof(existingDestinationObj), existingDestinationObj);
+      if (sourceObj == null)
+         return null;
+
+      if (existingDestinationObj == null)
+         return Map<TDestination>(sourceObj);
 
       Type srcType = sourceObj.GetType();
       Type destType = typeof(TDestination);
@@ -166,16 +206,31 @@ public class Mapper : IMapper
       MappingHandler mapping = _mappingHandlers.GetMappingHandler(srcType, destType);
 
       return mapping.Converter.Match(
-         convertMutable          => MapInternal(convertMutable, sourceObj, existingDestinationObj),
-         convertImmutable        => throw new InvalidImmutableMappingOperationException(srcType, destType),
-         convertMutableAsync     => MapInternal(convertMutableAsync, sourceObj, existingDestinationObj),
-         convertImmutableAsync   => throw new InvalidImmutableMappingOperationException(srcType, destType)
+         convertMutable                => 
+            MapInternal(convertMutable, sourceObj, existingDestinationObj),
+
+         convertImmutable              => 
+            throw new InvalidImmutableMappingOperationException(srcType, destType),
+
+         convertMutableAsync           => 
+            MapInternal(convertMutableAsync, sourceObj, existingDestinationObj),
+
+         convertImmutableAsync         => 
+            throw new InvalidImmutableMappingOperationException(srcType, destType),
+
+         convertImmutableWithBase      =>
+            MapInternal(convertImmutableWithBase, sourceObj, existingDestinationObj),
+
+         convertImmutableWithBaseAsync =>
+            MapInternal(convertImmutableWithBaseAsync, sourceObj, existingDestinationObj)
       );
    }
 
    public async Task<TDest> MapAsync<TDest>(object sourceObj)
+      where TDest : class
    {
-      CheckNotNull(nameof(sourceObj), sourceObj);
+      if (sourceObj == null) 
+         return null;
 
       Type sourceType = sourceObj.GetType();
       Type destinationType = typeof(TDest);
@@ -183,19 +238,34 @@ public class Mapper : IMapper
       MappingHandler mapping = _mappingHandlers.GetMappingHandler(sourceType, destinationType);
 
       return await mapping.Converter.Match(
-         async convertMutable          => MapInternal<TDest>(convertMutable, sourceObj),
-         async convertImmutable        => MapInternal<TDest>(convertImmutable, sourceObj),
-         async convertMutableAsync     => await MapInternalAsync<TDest>(convertMutableAsync, sourceObj),
-         async convertImmutableAsync   => await MapInternalAsync<TDest>(convertImmutableAsync, sourceObj)
+         async convertMutable                => 
+            MapInternal<TDest>(convertMutable, sourceObj),
+
+         async convertImmutable              => 
+            MapInternal<TDest>(convertImmutable, sourceObj),
+
+         async convertMutableAsync           => 
+            await MapInternalAsync<TDest>(convertMutableAsync, sourceObj),
+
+         async convertImmutableAsync         => 
+            await MapInternalAsync<TDest>(convertImmutableAsync, sourceObj),
+
+         async convertImmutableWithBase      =>
+            throw new InvalidImmutableMappingOperationException(sourceType, destinationType),
+
+         async convertImmutableWithBaseAsync => 
+            throw new InvalidImmutableMappingOperationException(sourceType, destinationType)
       );
    }
 
-   public async Task<TDest> MapAsync<TDest>(
-      object sourceObj, 
-      TDest existingDestObj)
+   public async Task<TDest> MapAsync<TDest>(object sourceObj, TDest existingDestObj)
+      where TDest : class
    {
-      CheckNotNull(nameof(sourceObj), sourceObj);
-      CheckNotNull(nameof(existingDestObj), existingDestObj);
+      if (sourceObj == null) 
+         return null;
+
+      if (existingDestObj == null)
+         return await MapAsync<TDest>(sourceObj);
 
       Type srcType = sourceObj.GetType();
       Type destType = typeof(TDest);
@@ -213,17 +283,19 @@ public class Mapper : IMapper
             await MapInternalAsync(convertMutableAsync, sourceObj, existingDestObj),
 
          async convertImmutableAsync => 
-            throw new InvalidImmutableMappingOperationException(srcType, destType)
+            throw new InvalidImmutableMappingOperationException(srcType, destType),
+
+         async convertImmutableWithBase =>
+            MapInternal<TDest>(convertImmutableWithBase, sourceObj, existingDestObj),
+
+         async convertImmutableWithBaseAsync =>
+            await MapInternalAsync<TDest>(convertImmutableWithBaseAsync, sourceObj, existingDestObj)
       );
    }
 
    public ICollection<TDest> MapList<TDest>(IEnumerable<object> sourceObjList)
+      where TDest : class
    {
-      CheckNotNull(nameof(sourceObjList), sourceObjList);
-
-      if (sourceObjList.Any(x => x == null))
-         throw new NullItemsInCollectionException();
-
       ICollection<TDest> destinationList =
          sourceObjList
          .Select(x => Map<TDest>(x))
@@ -233,19 +305,16 @@ public class Mapper : IMapper
    }
 
    public async Task<ICollection<TDestination>> MapListAsync<TDestination>(IEnumerable<object> sourceObjList)
+      where TDestination : class
    {
-      CheckNotNull(nameof(sourceObjList), sourceObjList);
+      List<TDestination> results = new List<TDestination>();
 
-      if (sourceObjList.Any(x => x == null))
-         throw new NullItemsInCollectionException();
+      // Awaits tasks one by one in case the mapping lambda contains some thread unsafe stuff (e.g.: EfCore).
+      foreach (object srcObj in sourceObjList)
+      {
+         results.Add(await MapAsync<TDestination>(srcObj));
+      }
 
-      List<Task<TDestination>> resultTasks =
-         sourceObjList
-         .Select(x => MapAsync<TDestination>(x))
-         .ToList();
-
-      await Task.WhenAll(resultTasks);
-
-      return resultTasks.Select(x => x.Result).ToList();
+      return results;
    }
 }

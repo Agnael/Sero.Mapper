@@ -10,9 +10,21 @@ namespace Sero.Mapper;
 /// </summary>
 public delegate void ConvertMutable(object src, object dest, IMapper mapper, IServiceProvider sp);
 public delegate object ConvertImmutable(object src, IMapper mapper, IServiceProvider sp);
+public delegate object ConvertImmutableWithBase(
+   object src, 
+   IMapper mapper, 
+   IServiceProvider sp,
+   object destBase
+);
 
 public delegate Task ConvertMutableAsync(object src, object dest, IMapper mapper, IServiceProvider sp);
 public delegate Task<object> ConvertImmutableAsync(object src, IMapper mapper, IServiceProvider sp);
+public delegate Task<object> ConvertImmutableWithBaseAsync(
+   object src, 
+   IMapper mapper, 
+   IServiceProvider sp,
+   object baseDest
+);
 
 /// <summary>
 ///   Delegate used to show to the user the lamda he has to write, with the concrete types relevant to the 
@@ -23,10 +35,26 @@ public delegate Task<object> ConvertImmutableAsync(object src, IMapper mapper, I
 public delegate void ConvertMutable<TSrc, TDest>(TSrc src, TDest dest, IMapper mapper, IServiceProvider sp);
 public delegate TDest ConvertImmutable<TSrc, TDest>(TSrc src, IMapper mapper, IServiceProvider sp);
 
+// NOTE: This delegate exists as a (hacky?) solution for the case in which a update form needs to be mapped
+// into an already existing model to modify it, and then the resulting updated record is returned.
+public delegate TDest ConvertImmutableWithBase<TSrc, TDest>(
+   TSrc src,
+   IMapper mapper, 
+   IServiceProvider sp,
+   TDest baseDest
+);
+
 public delegate 
    Task ConvertMutableAsync<TSrc, TDest>(TSrc src, TDest dest, IMapper mapper, IServiceProvider sp);
 public delegate 
    Task<TDest> ConvertImmutableAsync<TSrc, TDest>(TSrc src, IMapper mapper, IServiceProvider sp);
+public delegate
+   Task<TDest> ConvertImmutableWithBaseAsync<TSrc, TDest>(
+      TSrc src, 
+      IMapper mapper, 
+      IServiceProvider sp,
+      TDest baseDest
+   );
 
 /// <summary>
 ///   Container class for mapping transformations. It's necessary because we need a non-generic way to store 
@@ -35,7 +63,14 @@ public delegate
 public record MappingHandler(
    Type SourceType,
    Type DestinationType,
-   OneOf<ConvertMutable, ConvertImmutable, ConvertMutableAsync, ConvertImmutableAsync> Converter
+   OneOf<
+      ConvertMutable,
+      ConvertImmutable, 
+      ConvertMutableAsync, 
+      ConvertImmutableAsync,
+      ConvertImmutableWithBase,
+      ConvertImmutableWithBaseAsync
+   > Converter
 )
 {
    public override string ToString()
@@ -48,7 +83,9 @@ public record MappingHandler(
          ConvertMutable<TSrc, TDest>, 
          ConvertImmutable<TSrc, TDest>,
          ConvertMutableAsync<TSrc, TDest>,
-         ConvertImmutableAsync<TSrc, TDest>
+         ConvertImmutableAsync<TSrc, TDest>,
+         ConvertImmutableWithBase<TSrc, TDest>,
+         ConvertImmutableWithBaseAsync<TSrc, TDest>
       > converter)
    {
       MappingHandler mappingHandler =
@@ -101,6 +138,32 @@ public record MappingHandler(
                   (
                      async (src, mapper, sp) => 
                         await convertImmutableAsync.Invoke((TSrc)src, mapper, sp)
+                  )
+               );
+            },
+            convertImmutableWithBase =>
+            {
+               return new MappingHandler(
+                  typeof(TSrc),
+                  typeof(TDest),
+                  // Weird syntax because the lambda needs to get casted for OneOf to work this time.
+                  (ConvertImmutableWithBase)
+                  (
+                     (src, mapper, sp, destBase) =>
+                        convertImmutableWithBase.Invoke((TSrc)src, mapper, sp, (TDest)destBase)
+                  )
+               );
+            },
+            convertImmutableWithBaseAsync =>
+            {
+               return new MappingHandler(
+                  typeof(TSrc),
+                  typeof(TDest),
+                  // Weird syntax because the lambda needs to get casted for OneOf to work this time.
+                  (ConvertImmutableWithBaseAsync)
+                  (
+                     async (src, mapper, sp, destBase) =>
+                        await convertImmutableWithBaseAsync.Invoke((TSrc)src, mapper, sp, (TDest)destBase)
                   )
                );
             }
