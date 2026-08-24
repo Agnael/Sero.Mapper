@@ -7,3 +7,5 @@ Publish/
 
 Sero.Mapper.UnitTests/bin/
 Sero.Mapper.UnitTests/obj/
+# JetBrains Rider
+.idea/
