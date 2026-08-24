@@ -26,6 +26,18 @@ public class Mapper : IMapper
 		_mappingHandlers = mappingHandlers;
 	}
 
+	private void CheckNotNull(string argName, object argValue)
+	{
+		if (argValue == null)
+			throw new ArgumentNullException(argName);
+	}
+
+	private void CheckNotNull<TValue>(string argName, TValue argValue)
+	{
+		if (EqualityComparer<TValue>.Default.Equals(argValue, default(TValue)))
+			throw new ArgumentNullException(argName);
+	}
+
 	// --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
 	private object MapInternal(Type destType, ConvertMutable convertMutable, object srcObj)
 	{
@@ -255,8 +267,7 @@ public class Mapper : IMapper
 
 	public object Map(Type destType, object sourceObj)
 	{
-		if (sourceObj == null)
-			return null;
+		CheckNotNull(nameof(sourceObj), sourceObj);
 
 		Type sourceType = sourceObj.GetType();
 
@@ -312,11 +323,9 @@ public class Mapper : IMapper
 
 	public object Map(Type destType, object sourceObj, object existingDestinationObj)
 	{
-		if (sourceObj == null)
-			return null;
+		CheckNotNull(nameof(sourceObj), sourceObj);
 
-		if (existingDestinationObj == null)
-			return Map(destType, sourceObj);
+		CheckNotNull(nameof(existingDestinationObj), existingDestinationObj);
 
 		Type srcType = sourceObj.GetType();
 
@@ -350,8 +359,7 @@ public class Mapper : IMapper
 
 	public async Task<object> MapAsync(Type destType, object sourceObj)
 	{
-		if (sourceObj == null)
-			return null;
+		CheckNotNull(nameof(sourceObj), sourceObj);
 
 		Type sourceType = sourceObj.GetType();
 
@@ -385,11 +393,9 @@ public class Mapper : IMapper
 
 	public async Task<object> MapAsync(Type destType, object sourceObj, object existingDestObj)
 	{
-		if (sourceObj == null)
-			return null;
+		CheckNotNull(nameof(sourceObj), sourceObj);
 
-		if (existingDestObj == null)
-			return await MapAsync(destType, sourceObj);
+		CheckNotNull(nameof(existingDestObj), existingDestObj);
 
 		Type srcType = sourceObj.GetType();
 
@@ -423,6 +429,11 @@ public class Mapper : IMapper
 
 	public ICollection<TDest> MapList<TDest>(IEnumerable<object> sourceObjList)
 	{
+		CheckNotNull(nameof(sourceObjList), sourceObjList);
+
+		if (sourceObjList.Any(x => x == null))
+			throw new NullItemsInCollectionException();
+
 		ICollection<TDest> destinationList =
 		   sourceObjList
 		   .Select(x => Map<TDest>(x))
@@ -433,6 +444,11 @@ public class Mapper : IMapper
 
 	public async Task<ICollection<TDestination>> MapListAsync<TDestination>(IEnumerable<object> sourceObjList)
 	{
+		CheckNotNull(nameof(sourceObjList), sourceObjList);
+
+		if (sourceObjList.Any(x => x == null))
+			throw new NullItemsInCollectionException();
+
 		List<TDestination> results = new List<TDestination>();
 
 		// Awaits tasks one by one in case the mapping lambda contains some thread unsafe stuff (e.g.: EfCore).
