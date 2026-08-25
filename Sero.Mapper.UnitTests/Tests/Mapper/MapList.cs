@@ -32,8 +32,10 @@ namespace Sero.Mapper.Tests.MapperTests
             Assert.Equal<DestModel>(expectedList, actualList, _destComparer);
         }
 
+        // Null elements are mapped to nulls rather than rejecting the whole list,
+        // matching the permissive single-item behaviour. Deliberate since 48b91ee.
         [Fact]
-        public void Collection__WithNullElements__NullItemsInCollectionException()
+        public void Collection__WithNullElements__NullElementsMapToNull()
         {
             IList<SrcModel> srcList = new List<SrcModel>();
             srcList.Add(_srcBuilder.WithName("elem1"));
@@ -41,7 +43,13 @@ namespace Sero.Mapper.Tests.MapperTests
             srcList.Add(_srcBuilder.WithName("elem3"));
 
             Mapper sut = _sutBuilder.WithDefaultMapping().Build();
-            Assert.Throws<NullItemsInCollectionException>(() => sut.MapList<DestModel>(srcList));
+
+            ICollection<DestModel> actual = sut.MapList<DestModel>(srcList);
+
+            Assert.Equal(3, actual.Count);
+            Assert.NotNull(actual.ElementAt(0));
+            Assert.Null(actual.ElementAt(1));
+            Assert.NotNull(actual.ElementAt(2));
         }
     }
 }

@@ -56,12 +56,19 @@ namespace Sero.Mapper.Tests.MapperTests
             Assert.Equal(expected, actual, _destComparer);
         }
 
+        // Null handling is permissive by design (see 48b91ee, which replaced the
+        // earlier throwing behaviour). These tests pin that on purpose: a null
+        // destination means "no instance to populate", so one is created.
         [Fact]
-        public void Single__ProvidingDestinationInstanceParameterAsNull__ArgumentNullException()
+        public void Single__ProvidingDestinationInstanceParameterAsNull__CreatesNewDestination()
         {
             SrcModel src = _srcBuilder;
             Mapper sut = _sutBuilder.WithDefaultMapping().Build();
-            Assert.Throws<ArgumentNullException>(() => sut.Map<DestModel>(src, null));
+
+            DestModel actual = sut.Map<DestModel>(src, null);
+
+            Assert.NotNull(actual);
+            Assert.Equal((DestModel)_destBuilder, actual, _destComparer);
         }
 
         [Theory]
@@ -86,11 +93,13 @@ namespace Sero.Mapper.Tests.MapperTests
             Assert.Equal(expected, actual, _complexDestComparer);
         }
 
+        // A null source maps to a null destination rather than throwing.
         [Fact]
-        public void Single__Null__ArgumentNullException()
+        public void Single__Null__ReturnsNull()
         {
             Mapper sut = _sutBuilder.WithDefaultMapping().Build();
-            Assert.Throws<ArgumentNullException>(() => sut.Map<DestModel>(null));
+
+            Assert.Null(sut.Map<DestModel>(null));
         }
 
         [Fact]
